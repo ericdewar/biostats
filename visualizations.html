@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<!-- saved from url=(0022)http://localhost:3284/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Eric W. Dewar">
+
+<title>visualizations</title>
+<style class="anchorjs"></style><style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="./visualizations_files/clipboard.min.js"></script>
+<script src="./visualizations_files/quarto.js"></script>
+<script src="./visualizations_files/popper.min.js"></script>
+<script src="./visualizations_files/tippy.umd.min.js"></script>
+<script src="./visualizations_files/anchor.min.js"></script>
+<link href="./visualizations_files/tippy.css" rel="stylesheet">
+<link href="./visualizations_files/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="./visualizations_files/bootstrap.min.js"></script>
+<link href="./visualizations_files/bootstrap-icons.css" rel="stylesheet">
+<link href="./visualizations_files/bootstrap-973236bd072d72a04ee9cd82dcc9cb29.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+<style>.ansi-display{font-family:monospace;white-space:pre-wrap;--ansiBlack: #000000;--ansiRed: #cd3131;--ansiGreen: #00BC00;--ansiYellow: #949800;--ansiBlue: #0451a5;--ansiMagenta: #bc05bc;--ansiCyan: #0598bc;--ansiWhite: #555555;--ansiBrightBlack: #666666;--ansiBrightRed: #cd3131;--ansiBrightGreen: #14CE14;--ansiBrightYellow: #b5ba00;--ansiBrightBlue: #0451a5;--ansiBrightMagenta: #bc05bc;--ansiBrightCyan: #0598bc;--ansiBrightWhite: #a5a5a5}.dark-mode .ansi-display{--ansiBlack: #000000;--ansiRed: #cd3131;--ansiGreen: #0DBC79;--ansiYellow: #e5e510;--ansiBlue: #2472c8;--ansiMagenta: #bc3fbc;--ansiCyan: #11a8cd;--ansiWhite: #e5e5e5;--ansiBrightBlack: #666666;--ansiBrightRed: #f14c4c;--ansiBrightGreen: #23d18b;--ansiBrightYellow: #f5f543;--ansiBrightBlue: #3b8eea;--ansiBrightMagenta: #d670d6;--ansiBrightCyan: #29b8db;--ansiBrightWhite: #e5e5e5}@keyframes ansi-displaly-run-blink{50%{opacity:0}}.fui-FluentProvider h2{border-bottom:none;padding-bottom:0}</style><style data-make-styles-bucket="d" data-priority="0"></style><style id="fui-FluentProviderr0"></style></head>
+
+<body class="fullcontent quarto-light" data-tabster="{&quot;root&quot;:{}}">
+
+<i tabindex="0" role="none" data-tabster-dummy="" aria-hidden="true" style="position: fixed; height: 1px; width: 1px; opacity: 0.001; z-index: -1; content-visibility: hidden; top: 0px; left: 0px;"></i><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">visualizations</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Eric W. Dewar </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="sending-meaningful-visual-messages" class="level1">
+<h1>Sending meaningful visual messages</h1>
+<p>Graphics like tables and figures are an important aspect of communicating information because primates are highly visual animals. Well-designed graphics make it easier for us to us to communicate the “sense” of data far better than sentences or tables alone.</p>
+<p>There are rules for making successful graphics. Some of these are best practices that make good use of the abilities our eyes and brain has, but others are conventions depending on the kind of data that we are describing.</p>
+<p>R has a number of powerful tools for making publication-quality graphics. Many of them can be done with the <code>graphics</code> package that loads at startup in RStudio, but we can also use <code>ggplot2</code>, which is a <code>tidyverse</code> package that we have to activate when we want to use it.</p>
+<p>This tutorial won’t include every possible type of graph, but it will introduce a few useful ones and set you up to explore others as we work with different types of data.<br>
+</p>
+<hr>
+<section id="some-ground-rules-variables-and-types-of-data" class="level2">
+<h2 class="anchored" data-anchor-id="some-ground-rules-variables-and-types-of-data">Some ground rules: Variables and types of data<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#some-ground-rules-variables-and-types-of-data" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<p>Why talk about this now? Because the graphics that you make send a message about the kind of data that you observed. The <strong>video on the next page</strong> describes different kinds of graphics appropriate for various types of data.</p>
+<p>First of all, know that the word “data” is a plural word. The singular form is “datum,” meaning one data point. Your data come in variables that come a few different varieties or levels:</p>
+<table class="caption-top table">
+<caption>Levels of data and types of variables<br>
+</caption>
+<colgroup>
+<col style="width: 45%">
+<col style="width: 39%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type of variable</th>
+<th>Level</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Categorical</strong></td>
+<td><p><strong>Nominal</strong>—names only</p>
+<p><strong>Ordinal</strong>—there is a difference in magnitude, but not a real numerical one</p></td>
+<td><p>names of species</p>
+<p>small/medium/large<br>
+infant/juvenile/adult/aged</p></td>
+</tr>
+<tr class="even">
+<td><p><strong>Numerical</strong></p>
+<p>Can either be <strong>discrete</strong> (whole numbers only) or <strong>continuous</strong> (can be any real number).</p></td>
+<td><p><strong>Interval</strong>—measured on a scale with equal units, but without a 0 on the scale</p>
+<p><strong>Ratio</strong>—measurable on a scale with a “real” 0</p></td>
+<td><p>temperature in °C or °F</p>
+<p>length, mass, counts, etc.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The table above describes the levels of data <em>from low to high</em>—meaning that as you go down the rows, the data have more inherent information in them, giving you more options of tools to evaluate them. It’s always possible to “downshift” data from a higher level to a lower one. For example, you could weigh beetles using a scale (ratio level) but later call them “small or large” (ordinal level). You’d lose some information, but you’d be justified in your conclusions. Losing statistical resolution is a valid compromise to let us answer questions with messy data.</p>
+<p>However, you can’t go the <em>other</em> way, so that you’re “inventing” information. If I thought of my students as “tall vs.&nbsp;short,” I can’t later claim that all “tall” students on a list were 72 in tall while all “short” students were 62 in tall. That would invent information, and that is unjustified.</p>
+<p>So, best practice when you’re collecting your own data is to always try to gather them at as high a level as possible so that you can have the most statistical tools to analyze them later.<br>
+<br>
+</p>
+<hr>
+</section>
+<section id="plotting-in-base-r-vs.-ggplot2" class="level2">
+<h2 class="anchored" data-anchor-id="plotting-in-base-r-vs.-ggplot2">Plotting in base R vs.&nbsp;<code>ggplot2</code><a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#plotting-in-base-r-vs.-ggplot2" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<p>There are two ways that people make plots in RStudio. Both will result in clean, publication-quality graphics, and there are times when one might be preferable, but we should always aim for clarity in data presentation above all.</p>
+<p>The base R functions are helpful, but the functions in the package <code>ggplot2</code> (part of the <code>tidyverse</code> set) have a lot more presets and themes that are available. Always, always choose the approach that will give you the plot that will be most helpful to the viewer. Lots of extraneous shading or other non-data points might look cool, but our goal is always conveying the message of your data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="http://localhost:3284/#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load required packages</span></span>
+<span id="cb1-2"><a href="http://localhost:3284/#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># only needs to be run once per session</span></span>
+<span id="cb1-3"><a href="http://localhost:3284/#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.2     ✔ tibble    3.2.1
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+✔ purrr     1.0.4     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="http://localhost:3284/#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># includes functions from ggplot2 and lubridate used below</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br>
+</p>
+<hr>
+</section>
+<section id="categorical-data" class="level2">
+<h2 class="anchored" data-anchor-id="categorical-data">Categorical data<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#categorical-data" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<section id="making-tables" class="level3">
+<h3 class="anchored" data-anchor-id="making-tables">Making tables<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#making-tables" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<p>The first few examples will use my data set about the lengths of the skulls of mammalian carnivores and the bite force that they can generate. First we’ll bring in the data as a <strong>data frame</strong>, which is a common data structure in R that we can think of as like a spreadsheet. In R, categorical variables need to be made into a data frame so that they can be counted.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="http://localhost:3284/#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># bring in the data </span></span>
+<span id="cb4-2"><a href="http://localhost:3284/#cb4-2" aria-hidden="true" tabindex="-1"></a>sklbite <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://github.com/ericdewar/biostats/raw/refs/heads/master/SKL-bite.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>It’s a good idea to use the functions in the next chunk to inspect the data. The following code chunk will open another tab in the script window over this Quarto tab when it’s run in RStudio. You can just navigate back to here.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="http://localhost:3284/#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sklbite) <span class="co"># optional: shows the first few rows of the dataset</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 species      family length bite
+1        Galidia elegans Eupleuridae   7.03 35.5
+2    Herpestes edwardsii Herpestidae   7.80 46.2
+3      Eupleres goudotii Eupleuridae   8.81 28.6
+4 Conepatus semistriatus  Mustelidae   9.57 60.3
+5        Genetta tigrina  Viverridae   9.58 73.0
+6           Mungos mungo Herpestidae  10.30 34.0</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="http://localhost:3284/#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(sklbite) <span class="co"># optional: opens the data as a tab in the script pane </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If we wanted to know how many species were represented within each family, we could count them manually, but R can do it for us in a few steps. Once you get how the workflow is set up, this is <em>a lot</em> easier and more reliable than doing it by hand for large data sets.</p>
+<p>Note that the following code chunk will result in three small output panels showing the results when we run the in RStudio. In the final rendered document they will appear one after the other.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="http://localhost:3284/#cb8-1" aria-hidden="true" tabindex="-1"></a>familyTable <span class="ot">&lt;-</span> <span class="fu">table</span>(sklbite<span class="sc">$</span>family) <span class="co"># Makes a table object from the 'family' column of the data frame, listing the categories alphabetically</span></span>
+<span id="cb8-2"><a href="http://localhost:3284/#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="http://localhost:3284/#cb8-3" aria-hidden="true" tabindex="-1"></a>familyTable <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">table</span>(sklbite<span class="sc">$</span>family), <span class="at">decreasing =</span> <span class="cn">TRUE</span>) <span class="co"># Sorts the table object by frequency</span></span>
+<span id="cb8-4"><a href="http://localhost:3284/#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="http://localhost:3284/#cb8-5" aria-hidden="true" tabindex="-1"></a>familyTable <span class="co"># just reports back the sorted table in the console</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Canidae     Felidae  Viverridae  Mustelidae Eupleuridae Herpestidae 
+          5           5           5           4           3           3 
+  Hyaenidae     Ursidae Nandiniidae 
+          3           3           1 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="http://localhost:3284/#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">Frequency =</span> familyTable) <span class="co"># makes this a vertical table (more usable)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Frequency.Var1 Frequency.Freq
+1        Canidae              5
+2        Felidae              5
+3     Viverridae              5
+4     Mustelidae              4
+5    Eupleuridae              3
+6    Herpestidae              3
+7      Hyaenidae              3
+8        Ursidae              3
+9    Nandiniidae              1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="http://localhost:3284/#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">Frequency =</span> <span class="fu">addmargins</span>(familyTable)) <span class="co"># makes a vertical table with the total if you want that</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Frequency.Var1 Frequency.Freq
+1         Canidae              5
+2         Felidae              5
+3      Viverridae              5
+4      Mustelidae              4
+5     Eupleuridae              3
+6     Herpestidae              3
+7       Hyaenidae              3
+8         Ursidae              3
+9     Nandiniidae              1
+10            Sum             32</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="barcolumn-charts" class="level3">
+<h3 class="anchored" data-anchor-id="barcolumn-charts">Bar/column charts<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#barcolumn-charts" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<p>Bar charts are used to <strong>describe frequency distributions of samples of categorical data</strong>. Continuous data should be shown with histograms (more on them below). Bar charts should sort the categories from most frequent to less frequent. That will happen if you used the <code>sort</code> function above when you made the table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="http://localhost:3284/#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## the base R way</span></span>
+<span id="cb14-2"><a href="http://localhost:3284/#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(familyTable) <span class="co">#basic</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="http://localhost:3284/#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># base R with more options</span></span>
+<span id="cb15-2"><a href="http://localhost:3284/#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(familyTable, <span class="at">ylab =</span> <span class="st">"Frequency"</span>, <span class="at">las =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"firebrick"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="http://localhost:3284/#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ylab sets the label for the Y axis</span></span>
+<span id="cb16-2"><a href="http://localhost:3284/#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># las = 2 orients the labels horizontally </span></span>
+<span id="cb16-3"><a href="http://localhost:3284/#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="http://localhost:3284/#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="http://localhost:3284/#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># the ggplot way</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>las</code> argument (Label of Axis Style) used above lets us orient the tick mark labels for better readability. The options are:</p>
+<blockquote class="blockquote">
+<p><code>las = 1</code>: Parallel to axis (default)<br>
+<code>las = 2</code>: Horizontal<br>
+<code>las = 3</code>: Perpendicular to axis<br>
+<code>las = 4</code>: Vertical</p>
+</blockquote>
+<p>Some of the labels can get cut off in the base R plot when viewed in the Quarto document. It won’t always be a problem in the rendered document.</p>
+<p>Running that script in the console will make a plot appear in the Viewer tab. The margins can be set manually when needed and exported if you need (more later).</p>
+<p><a href="https://r-graph-gallery.com/74-margin-and-oma-cheatsheet.html">This website</a> elaborates a little on how to do it if you want to check it later on.<br>
+<br>
+</p>
+<hr>
+</section>
+</section>
+<section id="numerical-data" class="level2">
+<h2 class="anchored" data-anchor-id="numerical-data">Numerical data<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#numerical-data" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<section id="histograms" class="level3">
+<h3 class="anchored" data-anchor-id="histograms">Histograms<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#histograms" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<p>Histograms look like bar plots, but they are one way to show the <strong>distribution of a numerical variable across its observed range</strong> in a sample. The “bars” of the plot are right up against each other (unlike the bar plot), implying that the bins for each part of the range are continuous with one another.</p>
+<p>We’ll demonstrate making histograms using the carnivore bite force data set again.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="http://localhost:3284/#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># in case you need to reload the dataset into memory</span></span>
+<span id="cb17-2"><a href="http://localhost:3284/#cb17-2" aria-hidden="true" tabindex="-1"></a>sklbite <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://github.com/ericdewar/biostats/raw/refs/heads/master/SKL-bite.csv"</span>)</span>
+<span id="cb17-3"><a href="http://localhost:3284/#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="http://localhost:3284/#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="do">## the base R way</span></span>
+<span id="cb17-5"><a href="http://localhost:3284/#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="http://localhost:3284/#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># make a plot of the lengths of carnivore skulls in the sample</span></span>
+<span id="cb17-7"><a href="http://localhost:3284/#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="http://localhost:3284/#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(sklbite<span class="sc">$</span>length, <span class="at">right =</span> <span class="cn">FALSE</span>) <span class="co">#basic</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="http://localhost:3284/#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the $ indicates that we are plotting the length column of the dataset</span></span>
+<span id="cb18-2"><a href="http://localhost:3284/#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="http://localhost:3284/#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(sklbite<span class="sc">$</span>length, <span class="at">right =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb18-4"><a href="http://localhost:3284/#cb18-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Skull Length (cm)"</span>, <span class="at">ylab =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb18-5"><a href="http://localhost:3284/#cb18-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"violet"</span>,</span>
+<span id="cb18-6"><a href="http://localhost:3284/#cb18-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-6-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="http://localhost:3284/#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># main = "" makes a blank legend</span></span>
+<span id="cb19-2"><a href="http://localhost:3284/#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="http://localhost:3284/#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># change the bin sizes</span></span>
+<span id="cb19-4"><a href="http://localhost:3284/#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(sklbite<span class="sc">$</span>length, <span class="at">right =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb19-5"><a href="http://localhost:3284/#cb19-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Skull Length (cm)"</span>, <span class="at">ylab =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb19-6"><a href="http://localhost:3284/#cb19-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">40</span>),</span>
+<span id="cb19-7"><a href="http://localhost:3284/#cb19-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"goldenrod"</span>,</span>
+<span id="cb19-8"><a href="http://localhost:3284/#cb19-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">5</span>, <span class="dv">35</span>, <span class="at">by =</span> <span class="dv">2</span>), <span class="co"># range 3-25 cm, bin sizes 2 cm each</span></span>
+<span id="cb19-9"><a href="http://localhost:3284/#cb19-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-6-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>right = FALSE</code> indicates that the bins are left-bounded. This means if you had the data binned in 2 cm groups, then the bins would go from 0 to 2 and the next were 2 to 4, an observation of 1 would be included in the first bin but 2 would be in the next bin. You can decide how you want to define the borders of your bins in a way that describes your data in clearly.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>I usually use the “dollar sign” way to indicate which column of a data frame I want to work with, like this: <code>hist(sklbite$length)</code> but an alternative is <code>hist(length, data = sklbite)</code>. I like the first way better because this way I can use the autofill functions in the console or script window to suggest column names rather than having to remember them.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="boxplots" class="level3">
+<h3 class="anchored" data-anchor-id="boxplots">Boxplots<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#boxplots" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<p>Boxplots (or box-and-whisker plots) are also used to show the distribution of numerical variables, especially when comparing different groups.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="http://localhost:3284/#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="do">## the base R way</span></span>
+<span id="cb20-2"><a href="http://localhost:3284/#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="http://localhost:3284/#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"chickwts"</span>) <span class="co"># loads a built-in data set about the weights of chicks on different feed types</span></span>
+<span id="cb20-4"><a href="http://localhost:3284/#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="http://localhost:3284/#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="http://localhost:3284/#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(chickwts<span class="sc">$</span>weight <span class="sc">~</span> chickwts<span class="sc">$</span>feed) <span class="co">#basic</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="http://localhost:3284/#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The argument in the parentheses is Y ~ X</span></span>
+<span id="cb21-2"><a href="http://localhost:3284/#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="http://localhost:3284/#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(chickwts<span class="sc">$</span>weight <span class="sc">~</span> chickwts<span class="sc">$</span>feed, </span>
+<span id="cb21-4"><a href="http://localhost:3284/#cb21-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">las =</span> <span class="dv">2</span>,</span>
+<span id="cb21-5"><a href="http://localhost:3284/#cb21-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">factor</span>(chickwts<span class="sc">$</span>feed),</span>
+<span id="cb21-6"><a href="http://localhost:3284/#cb21-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">"Type of feed"</span>, <span class="at">ylab =</span> <span class="st">"Mass (g)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-7-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="http://localhost:3284/#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the color function here assigns a color for each family.</span></span>
+<span id="cb22-2"><a href="http://localhost:3284/#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="http://localhost:3284/#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># or you can assign them manually</span></span>
+<span id="cb22-4"><a href="http://localhost:3284/#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(sklbite<span class="sc">$</span>bite <span class="sc">~</span> sklbite<span class="sc">$</span>family, </span>
+<span id="cb22-5"><a href="http://localhost:3284/#cb22-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">las =</span> <span class="dv">2</span>,</span>
+<span id="cb22-6"><a href="http://localhost:3284/#cb22-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"orange"</span>, <span class="st">"yellow"</span>, <span class="st">"green"</span>, <span class="st">"lightblue"</span>, <span class="st">"violet"</span>, </span>
+<span id="cb22-7"><a href="http://localhost:3284/#cb22-7" aria-hidden="true" tabindex="-1"></a>                <span class="st">"orangered"</span>, <span class="st">"dodgerblue"</span>, <span class="st">"brown"</span>),</span>
+<span id="cb22-8"><a href="http://localhost:3284/#cb22-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">"Bite force (N)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-7-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The family groups don’t have a lot of variation, but if you look at the felid, hyaend, or ursid groups, you’ll notice what a typical boxplot looks like:</p>
+<ul>
+<li><p>the box shows the interquartile range, or the moddle 50% of the data.</p></li>
+<li><p>the line in the box is the median, the 50% line of the data (<em>not</em> the mean)</p></li>
+<li><p>the whiskers depict the top and bottom 25% of the distribution</p></li>
+<li><p>the circles are outliers, observations that are noticeably outside the rest of the data</p></li>
+</ul>
+<hr>
+</section>
+<section id="scatter-plots" class="level3">
+<h3 class="anchored" data-anchor-id="scatter-plots">Scatter plots<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#scatter-plots" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<p>Scatter plots are used to show the relationship between two numerical variables.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="http://localhost:3284/#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="do">## the base R way</span></span>
+<span id="cb23-2"><a href="http://localhost:3284/#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="http://localhost:3284/#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sklbite<span class="sc">$</span>bite <span class="sc">~</span> sklbite<span class="sc">$</span>length) <span class="co">#basic </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="http://localhost:3284/#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The argument in the parentheses is Y ~ X</span></span>
+<span id="cb24-2"><a href="http://localhost:3284/#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="http://localhost:3284/#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sklbite<span class="sc">$</span>bite <span class="sc">~</span> sklbite<span class="sc">$</span>length, </span>
+<span id="cb24-4"><a href="http://localhost:3284/#cb24-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">las =</span> <span class="dv">1</span>, <span class="co"># axis label oriented to read</span></span>
+<span id="cb24-5"><a href="http://localhost:3284/#cb24-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">col =</span> <span class="st">"firebrick"</span>, <span class="co"># solid red circle icon</span></span>
+<span id="cb24-6"><a href="http://localhost:3284/#cb24-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="co"># expand icon to 1.5x</span></span>
+<span id="cb24-7"><a href="http://localhost:3284/#cb24-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">bty =</span> <span class="st">"l"</span>, <span class="co"># make the box around the data an "L" shape</span></span>
+<span id="cb24-8"><a href="http://localhost:3284/#cb24-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Skull length (cm)"</span>, <span class="at">ylab =</span> <span class="st">"Bite force (N)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-8-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="http://localhost:3284/#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sklbite<span class="sc">$</span>bite <span class="sc">~</span> sklbite<span class="sc">$</span>length, </span>
+<span id="cb25-2"><a href="http://localhost:3284/#cb25-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">las =</span> <span class="dv">1</span>, <span class="co"># axis label oriented to read</span></span>
+<span id="cb25-3"><a href="http://localhost:3284/#cb25-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">col =</span> <span class="fu">factor</span>(sklbite<span class="sc">$</span>family), <span class="co"># colors by family</span></span>
+<span id="cb25-4"><a href="http://localhost:3284/#cb25-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="co"># expand icon to 1.5x</span></span>
+<span id="cb25-5"><a href="http://localhost:3284/#cb25-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">bty =</span> <span class="st">"l"</span>, <span class="co"># make the box around the data an "L" shape</span></span>
+<span id="cb25-6"><a href="http://localhost:3284/#cb25-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Skull length (cm)"</span>, <span class="at">ylab =</span> <span class="st">"Bite force (N)"</span>)</span>
+<span id="cb25-7"><a href="http://localhost:3284/#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="at">x=</span><span class="st">"topright"</span>,</span>
+<span id="cb25-8"><a href="http://localhost:3284/#cb25-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(sklbite<span class="sc">$</span>family),</span>
+<span id="cb25-9"><a href="http://localhost:3284/#cb25-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">factor</span>(sklbite<span class="sc">$</span>family), </span>
+<span id="cb25-10"><a href="http://localhost:3284/#cb25-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-8-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The function <code>pch</code> means “plotting character” used for data points. There are a bunch of preset icons (0-25) that can be used.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./visualizations_files/pch.png" class="img-fluid figure-img"></p>
+<figcaption>R plotting symbols</figcaption>
+</figure>
+</div>
+<p>You can also assign letters if you choose. There is more information under <code>help(pch)</code> or many graphics-help <a href="https://r-charts.com/base-r/pch-symbols/">websites</a>. <a href="https://r-graph-gallery.com/">Here</a> too.<br>
+<br>
+</p>
+<hr>
+</section>
+<section id="stripcharts" class="level3">
+<h3 class="anchored" data-anchor-id="stripcharts">Stripcharts<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#stripcharts" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<p>Stripcharts are like boxplots but represent each point in the group. This is another great plot type because it actually shows all the data. I recommend using a “hollow” plotting character (0-6 on the figure above) so that you can see when they overlap.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="http://localhost:3284/#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># bring in the built-in dataset chickwts again</span></span>
+<span id="cb26-2"><a href="http://localhost:3284/#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"chickwts"</span>) </span>
+<span id="cb26-3"><a href="http://localhost:3284/#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="http://localhost:3284/#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="do">## the base R way</span></span>
+<span id="cb26-5"><a href="http://localhost:3284/#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="http://localhost:3284/#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stripchart</span>(weight <span class="sc">~</span> feed, <span class="at">data =</span> chickwts, <span class="at">method =</span> <span class="st">"jitter"</span>, <span class="at">las =</span> <span class="dv">2</span>, <span class="at">vertical =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="http://localhost:3284/#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stripchart</span>(weight <span class="sc">~</span> feed, <span class="at">data =</span> chickwts, <span class="at">xlab =</span> <span class="st">"Type of feed"</span>, <span class="at">ylab =</span> <span class="st">"Weight (g)"</span>, <span class="at">col =</span> <span class="st">"firebrick"</span>, <span class="at">las =</span> <span class="dv">2</span>, <span class="at">method =</span> <span class="st">"jitter"</span>, <span class="at">vertical =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-9-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+<p>Line graphs</p>
+<p>Used for a numerical variable sampled over a time series</p>
+<p>data(“Nile”) # load the datset about water levels through time</p>
+<p>Nile # reports the data in the console</p>
+<p>plot(Nile, type=“l”) #basic</p>
+<p>plot(Nile, type=“l”, las = 1, col = “blue”, ylab = “Water Flow of Nile River”, xlab = “Year”)</p>
+</section>
+<section id="line-plots" class="level3">
+<h3 class="anchored" data-anchor-id="line-plots">Line plots<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#line-plots" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<p>Line plots show the changes in a numerical variable over time.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="http://localhost:3284/#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"Nile"</span>) <span class="co"># load the datset about water flow in the Nile River through time</span></span>
+<span id="cb28-2"><a href="http://localhost:3284/#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="http://localhost:3284/#cb28-3" aria-hidden="true" tabindex="-1"></a>Nile <span class="co"># view the object in the console</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time Series:
+Start = 1871 
+End = 1970 
+Frequency = 1 
+  [1] 1120 1160  963 1210 1160 1160  813 1230 1370 1140  995  935 1110  994 1020
+ [16]  960 1180  799  958 1140 1100 1210 1150 1250 1260 1220 1030 1100  774  840
+ [31]  874  694  940  833  701  916  692 1020 1050  969  831  726  456  824  702
+ [46] 1120 1100  832  764  821  768  845  864  862  698  845  744  796 1040  759
+ [61]  781  865  845  944  984  897  822 1010  771  676  649  846  812  742  801
+ [76] 1040  860  874  848  890  744  749  838 1050  918  986  797  923  975  815
+ [91] 1020  906  901 1170  912  746  919  718  714  740</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="http://localhost:3284/#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="do">## the base R way</span></span>
+<span id="cb30-2"><a href="http://localhost:3284/#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="http://localhost:3284/#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Nile, <span class="at">type=</span><span class="st">"l"</span>) <span class="co">#basic</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="http://localhost:3284/#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Nile, <span class="at">type=</span><span class="st">"l"</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">ylab =</span> <span class="st">"Water Flow of Nile River"</span>, <span class="at">xlab =</span> <span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="./visualizations_files/unnamed-chunk-10-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><br>
+</p>
+<hr>
+</section>
+</section>
+<section id="levels-of-data-and-graphics" class="level2">
+<h2 class="anchored" data-anchor-id="levels-of-data-and-graphics">Levels of data and graphics<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#levels-of-data-and-graphics" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<section id="some-take-home-messages" class="level3">
+<h3 class="anchored" data-anchor-id="some-take-home-messages"><strong><em>Some take-home messages:</em></strong><a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#some-take-home-messages" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<ul>
+<li><p>When <strong>describing frequency distributions of samples</strong>, categorial data are described with bar charts but numerical data should be shown with histograms.</p>
+<ul>
+<li>Numerical variables can be read straight from the “column” of a data frame (this is the way that CSV spreadsheets are usually treated in R).</li>
+</ul></li>
+<li><p><strong>Relationships between two numerical variables</strong> are best shown by</p>
+<ul>
+<li><p>a scatterplot for regular XY data comparisons (confirm that you actually have two variables before using!)</p></li>
+<li><p>a line graph if showing the trend of a variable over time</p></li>
+<li><p>or a map (for trends with space or geographic area).</p></li>
+</ul></li>
+<li><p><strong>Relationships between two categorical variables</strong> could be shown with:</p>
+<ul>
+<li><p>a grouped bar chart</p></li>
+<li><p>a mosaic plot (which has the advantage of expressing the difference in sample size <em>and</em> proportion).</p></li>
+</ul></li>
+<li><p><strong>Relationships between one numerical and one categorical variable</strong> are described well by</p>
+<ul>
+<li><p>strip charts</p></li>
+<li><p>boxplots (also called box-and-whisker plots)</p></li>
+<li><p>multiple (stacked) histograms</p></li>
+<li><p>cumulative frequency distributions</p></li>
+</ul></li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="exporting-plots-to-other-applications" class="level2">
+<h2 class="anchored" data-anchor-id="exporting-plots-to-other-applications">Exporting plots to other applications<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#exporting-plots-to-other-applications" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h2>
+<hr>
+<section id="links-to-other-resources" class="level3">
+<h3 class="anchored" data-anchor-id="links-to-other-resources">Links to other resources<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="http://localhost:3284/#links-to-other-resources" style="font: 1em / 1 anchorjs-icons; margin-left: 0.1875em; padding-right: 0.1875em; padding-left: 0.1875em;"></a></h3>
+<p><a href="https://rstudio.github.io/cheatsheets/html/data-visualization.html">ggplot2 cheat sheet</a><br>
+See lots of additional settings and features here.</p>
+<p><a href="https://r-graph-gallery.com/">R graph gallery</a></p>
+<p><a href="https://r-charts.com/">r-charts.com</a></p>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+
+<script>window.backupDefine = window.define; window.define = undefined;</script>
+<script type="text/javascript" src="./visualizations_files/quarto-preview.js"></script>
+<script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+<script type="text/javascript">
+  const options = {
+    origin: "",
+    search: "",
+    inputFile: "/Users/edewar/Library/CloudStorage/OneDrive-SuffolkUniversity/Classes/Bio 273 F25/Scripts-qmd/visualizations.qmd",
+    isPresentation: false
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    window.QuartoPreview.init(options);
+  });
+</script>
+<div><div dir="ltr" class="fui-FluentProvider fui-FluentProviderr0 ___jdtuxv0 f19n0e5 fxugw4r f1o700av fk6fouc fkhj508 figsok6 f1i3iumi"></div></div><i tabindex="0" role="none" data-tabster-dummy="" aria-hidden="true" style="position: fixed; height: 1px; width: 1px; opacity: 0.001; z-index: -1; content-visibility: hidden; top: 0px; left: 0px;"></i></body></html>
