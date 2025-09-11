@@ -1,0 +1,164 @@
+---
+title: "Describing data"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+## Basic sample statistics
+
+The ideas here aren't difficult, but it's a necessary foundation for making estmates and inferences about data. For numerical data, we want to be able to describe the [central tendency]{.underline} and [dispersion]{.underline} of a sample. Categorical data are described by [proportions]{.underline} of outcomes.
+
+### Sample mean (or arithmetic mean)
+
+The **arithmetic mean** is the familiar "average" or "center of gravity" of a sample, or a typical value that we might expect from repeated sampling.
+
+In R, the command to calculate the mean is simple: it's just `mean`.
+
+```{r}
+
+# This creates a vector that is a sample of 40 whole numbers # taken randomly from 1 to 800 with replacement
+w <- sample(1:800, 40, replace = TRUE)
+
+w  # the object name alone reports the values in the console
+
+# You could sort the random data if you wanted
+data <- sort(w, decreasing = FALSE) 
+# decreasing = FALSE is an argument that tells R to sort the values from low to high
+
+data  #report the sorted object in the console
+
+# take the mean of the sorted vector object
+mean(data)
+```
+
+The console output always leads with a `[1]`. For longer vectors, it starts at one and when the output wraps around it shows the count.
+
+Notice that the output in the console shows the individual commands (functions) and the output. The Quarto output shows the output only.
+
+**Try this with a built-in dataset**
+
+```{r}
+# bring in the built-in dataset about the lengths of North American Rivers
+data("rivers")
+
+# calculate the sample mean for one column of a data frame (ignoring groups)
+mean(rivers) 
+```
+
+#### Getting means of separate groups
+
+Those calculations of the mean treat every observation as the same. Sometimes we want to calculate the means of groups within the data set. For this we use a different function called `tapply`.
+
+```{r}
+# bring in the dataset about weights of chickens raised on different types of feed
+data("chickwts")
+
+View(chickwts) # shows the dataset in the scripts pane
+
+# calculates the mean of ALL the data
+mean(chickwts$weight) 
+
+# calculate the means of each group in the sample
+tapply(chickwts$weight, chickwts$feed, mean) 
+```
+
+So, you see that we get the mean values for the six types of feeds.
+
+The general form of `tapply` (table apply) is `X` = the column we want, `INDEX` = the cartegorizing variable (feed types), and `FUN` = a function or operation that needs to be applied (the mean). Note that changing the function part will allow you to calculate other sample statistics across groups in a data frame: sd, median, length (i.e., sample size), quantile, etc.
+
+::: callout-caution
+Be aware that **the mean is very sensitive to outliers**. Use caution when reporting the mean or using mean-based statistics when our sample includes outliers. If we have a data set that has extreme outlier values or distributions that are skewed, then we should use the **median**, another measure of central tendency described below.
+:::
+
+### Standard Deviation
+
+The **standard deviation** (SD) describes the spread of a sample distribution—how different, in general, are different observations from the mean? The SD is derived from another measure of dispersion called the **variance**, but we prefer the SD because (for reasons of arithmetic) it keeps the same units as our observations.
+
+The SD from raw data is equally easy in R:
+
+```{r}
+sd(data)
+
+sd(rivers)
+
+tapply(chickwts$weight, chickwts$feed, sd) # calculate the SD of each group in the sample
+```
+
+**Note** that the **`object$column`** way will be the usual way that we will refer to objects most of the time for data from a spreadsheet that R uses as a data frame. You could also use **`sd(column, data = object)`** but my usual way lets you use the auto-suggest functions in R so you don't have to memorize the column headings.
+
+------------------------------------------------------------------------
+
+### The median and interquartile range
+
+The median and interquartile range are other descriptors of numerical data. The **median** is a measure of central tendency, but it's the "50% line" or middle value in our data when they are range from low to high. It shows us where half of our data are above and below the middle value. (When we have an even sample size, take the mean of the two middle numbers.) The **interquartile range** is the "middle 50%" of our data.
+
+As you might predict, in R the function to calculate the median is simply `median`. The other "quantiles" (25%, 75% levels, or others) are given by `quantile`.
+
+```{r}
+median(data) # gives the 50% line of the sample
+
+# gives all the quartiles of a sample, if that's what you want
+quantile(data) 
+
+# calculate the median of each group in the sample
+tapply(chickwts$weight, chickwts$feed, median) 
+```
+
+------------------------------------------------------------------------
+
+## The sample proportion
+
+### The Standard Error
+
+sd(Orange$age) / sqrt(length(Orange$age))\
+\# sqrt() is the square root function \# length() counts the data for the sample size
+
+OrangeAgeSE \<- sd(Orange$age) / sqrt(length(Orange$age)) \# a measure of the spread of the sampling distribution of the sample mean
+
+------------------------------------------------------------------------
+
+### But wait!
+
+These approaches work like this when we are working from raw data. If our data were represented in a frequency distribution table rather than a spreadsheet, we need to account for each observation.
+
+For example, if we had this frequency distribution of body heights:
+
+|            |           |
+|:----------:|:---------:|
+| **Height** | **Freq.** |
+|     61     |     1     |
+|     62     |     4     |
+|     63     |     5     |
+|     65     |     8     |
+|     66     |     4     |
+|     68     |     2     |
+|     70     |     1     |
+
+**The mean is not 65.0**. That's what we'd get if we added the height observations and divided by 7.
+
+The problem is that we have 25 observations. Our raw data would be this: 61, 62, 62, 62, 62, 63, 63, 63, 63, 63, 65...skipping a few... ending with 70. The mean is 1614/25 = 64.56.
+
+Don't mess that one up. That's rookie mistake.
+
+------------------------------------------------------------------------
+
+## **Stuff to do**
+
+### **Do the following and save the functions to your script:**
+
+*Use comments* to indicate what you're doing at each step. Don't just leave uncommented code.
+
+1.  Find the dataset called **crab.csv** on [GitHub](https://github.com/ericdewar/biostats) and bring it into memory as a dataframe.
+
+2.  What are the means of the groups in this sample?
+
+3.  Bring in the built-in dataset called **LakeHuron**.
+
+4.  View the LakeHuron dataset in a tab.
+
+5.  What is the median of the depths of Lake Huron over the time period measured?
+
+6.  Generate a random sample of 50 numbers from 300 to 600.
+
+7.  What are the quartiles of this sample?
