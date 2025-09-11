@@ -1,0 +1,148 @@
+---
+title: "bringing in data.qmd"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+## Bringing data into R
+
+So far, we've only entered data into the console directly. There are a few other ways to bring in data from **spreadsheets** or **built-in datasets** from R itself or **generate random data**.
+
+### **👩‍💻 Create a new script from the File menu or the new script button at the upper left. This can be a regular R script or a Quarto document.**
+
+------------------------------------------------------------------------
+
+## Data from your own drive using the console
+
+### 💻 Using the desktop application
+
+This might be the most common way that we work with data—using spreadsheets from files on our own hard drives.
+
+#### Option 1
+
+Let's find the **SKL-bite.csv** dataset on your drive by entering `file.choose()` into the console.
+
+```{r}
+file.choose()
+```
+
+Running this function opens a dialog box where you can specify where to find this dataset. Once you locate it, R will report the path in the console. To bring in those data, copy the file path and create an object using the `read.csv` (combine or concatenate) function. Replace the part within the parentheses.
+
+```{r}
+teeth <- read.csv(replace-with-file-path-here)
+
+View(teeth) # previews the spreadsheet (data frame) in a tab
+```
+
+### Option 2
+
+First, download a package called **readr** into R by entering this function into the console (or by executing this block):
+
+```{r}
+install.packages("readr")
+```
+
+Or you can use the **Install** button in the **Packages** pane and search for **readr**. You will only need to install it once.
+
+Now go to the **Files** pane and find the dataset from your drive. Click the file name to pop up a menu—click **Import Dataset...** to bring up another dialog box. This will allow you to inspect the dataset and import it, even being able to copy the code for your script☁️ Using Posit Cloud
+
+In the **Files** pane, select the **Upload** button. This will open a dialog box where you can select the file that you want to connect.
+
+### ☁️ Using Posit Cloud
+
+You can file the file on your drive using the **Upload** button in the **Files** pane. Once you have the path, you can do it like the desktop version. To bring in those data, copy the file path and create an object using the `read.csv` (combine or concatenate) function. Replace the part within the parentheses.
+
+```{r}
+teethCloud <- read.csv(replace-with-file-path-here)
+
+View(teethCloud) # previews the spreadsheet (data frame) in a tab
+```
+
+\
+
+------------------------------------------------------------------------
+
+## Data from GitHub
+
+### 💻 ☁️ For both desktop and Posit Cloud
+
+For convenience in our class, I will frequently provide direct links to GitHub to avoid the need to fuss with data files. GitHub is a version-control system for file storage and sharing. I'll show more features later.
+
+Navigate over to our [class repository area](https://github.com/ericdewar/biostats/tree/master) (this pop-up link opens a browser tab). Then click **SKL-bite.csv** from the file list. Clicking the file opens a page that shows a preview and other stuff. Find the **Raw** button and right-click or option click so that a menu pops up. Choose **Copy link address**.
+
+To bring in those data, copy the URL and create an object using the `read.csv` (combine or concatenate) function, with the `url` part nested inside.
+
+```{r}
+teethGit <- read.csv(url("https://github.com/ericdewar/biostats/raw/refs/heads/master/SKL-bite.csv"))
+
+View(teethGit) # previews the spreadsheet (data frame) in a tab
+```
+
+## 
+
+------------------------------------------------------------------------
+
+## Bringing in a built-in dataset
+
+R has a number of toy datasets preinstalled. You can see the full list of them with `data()`. We'll bring in a particular one called **Orange**:
+
+```{r}
+data("Orange")
+```
+
+Once that is brought into memory, it shows up in the environment pane as a `<promise>`. Click the name name to put it with the other data objects. It will appear in the console too.\
+
+------------------------------------------------------------------------
+
+## Generating random samples
+
+This function creates a vector that is a sample of 10 whole numbers taken randomly from 1 to 100 with replacement
+
+```{r}
+a <- sample(1:100, 10, replace = TRUE)
+```
+
+This makes a vector based on a normal distribution with a mean (center) of 50 and standard deviation (spread) of 5:
+
+```{r}
+n <- rnorm(n=100, mean=50, sd=5)
+```
+
+------------------------------------------------------------------------
+
+## Using these objects in memory
+
+The function `mean()` gives the the sample mean for an array or "column" from a data frame. We'll work through more examples later.
+
+```{r}
+mean(a) #gives the mean of the object a
+```
+
+```{r}
+mean(Orange$age) #gives the sample mean for one column of a data frame
+```
+
+------------------------------------------------------------------------
+
+## **Stuff to do**
+
+### **Do the following and save the functions to your script:**
+
+*Use comments* to indicate what you're doing at each step. Don't just leave uncommented code.
+
+1.  Find the dataset called **hyena.csv** on GitHub and bring it into memory as a dataframe.
+
+2.  View the hyena dataset as a tab.
+
+3.  What is the mean of the ages of the hyenas in this sample?
+
+4.  Bring in the built-in dataset called **iris**.
+
+5.  View the iris dataset in a tab.
+
+6.  What is the mean sepal width of all the iris sample? It's okay to ignore the species groupings for now.
+
+7.  Generate a random sample of 50 numbers from 200 to 500 (not a normal distribution).
+
+8.  What is the mean of this sample?
