@@ -107,20 +107,30 @@ tapply(chickwts$weight, chickwts$feed, median)
 
 ------------------------------------------------------------------------
 
-## The sample proportion
-
 ### The Standard Error
 
-sd(Orange$age) / sqrt(length(Orange$age))\
-\# sqrt() is the square root function \# length() counts the data for the sample size
+When we are evaluating our confidence in the reliability of a sample mean, we don't use the standard deviation. The **standard deviation of the mean** describes the spread of a sample's distribution (rather than a population's)—how different, in general, are observations from the mean?
 
-OrangeAgeSE \<- sd(Orange$age) / sqrt(length(Orange$age)) \# a measure of the spread of the sampling distribution of the sample mean
+Beginners may use these interchangeably, but we'll get fussier about this as we start learning statistical tests.
+
+The SD is calculated as $\frac{SD}{\sqrt{n}}$, but we don't usually have to calculate the standard error in R because statistics that require it will calculate it automatically. If we wanted to do it by hand in R it would be
+
+```{r}
+
+sd(Orange$age) / sqrt(length(Orange$age))
+# sqrt() is the square root function 
+# length() counts the data for the sample size
+
+# or to make it an object
+OrangeAgeSE <- sd(Orange$age) / sqrt(length(Orange$age)) 
+# a measure of the spread of the sampling distribution of the sample mean
+```
 
 ------------------------------------------------------------------------
 
 ### But wait!
 
-These approaches work like this when we are working from raw data. If our data were represented in a frequency distribution table rather than a spreadsheet, we need to account for each observation.
+These approaches work like this *when we are working from raw data*. If our data were represented in a frequency distribution table rather than a spreadsheet, we need to account for each observation.
 
 For example, if we had this frequency distribution of body heights:
 
@@ -140,25 +150,3 @@ For example, if we had this frequency distribution of body heights:
 The problem is that we have 25 observations. Our raw data would be this: 61, 62, 62, 62, 62, 63, 63, 63, 63, 63, 65...skipping a few... ending with 70. The mean is 1614/25 = 64.56.
 
 Don't mess that one up. That's rookie mistake.
-
-------------------------------------------------------------------------
-
-## **Stuff to do**
-
-### **Do the following and save the functions to your script:**
-
-*Use comments* to indicate what you're doing at each step. Don't just leave uncommented code.
-
-1.  Find the dataset called **crab.csv** on [GitHub](https://github.com/ericdewar/biostats) and bring it into memory as a dataframe.
-
-2.  What are the means of the groups in this sample?
-
-3.  Bring in the built-in dataset called **LakeHuron**.
-
-4.  View the LakeHuron dataset in a tab.
-
-5.  What is the median of the depths of Lake Huron over the time period measured?
-
-6.  Generate a random sample of 50 numbers from 300 to 600.
-
-7.  What are the quartiles of this sample?
