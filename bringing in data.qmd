@@ -101,6 +101,7 @@ This function creates a vector that is a sample of 10 whole numbers taken random
 
 ```{r}
 a <- sample(1:100, 10, replace = TRUE)
+a
 ```
 
 This makes a vector based on a normal distribution with a mean (center) of 50 and standard deviation (spread) of 5:

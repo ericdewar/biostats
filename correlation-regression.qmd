@@ -1,0 +1,352 @@
+---
+title: "correlation-regression"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+# Bivariate statistical tests: Correlation and regression
+
+**X! Finally!** We've been spending all our time looking at response variables so far, and now we learn the first of the techniques that we'll use for looking at explanatory and response variables together.
+
+**You'll see that correlation and regression are both models that compare X (explanatory) and Y (response) variables, but these tests look at different things:**
+
+-   **Correlation** looks at the strength of the relationship (the clustering) between two variables but [does not]{.underline} assume that X *causes* the state of Y.
+
+    -   ***Answers the question:*** Does X change with Y in a linear fashion?
+
+-   **Regression** uses a linear model to *predict* the value of Y given a particular X. In this case we do assume that the value of X causes the value of Y.
+
+    -   ***Answers the question:*** Does the value of X strongly [predict]{.underline} the value of Y?
+
+![](https://www.dropbox.com/scl/fi/w3ngiepbx26wplv9eqa44/corr-regr.png?rlkey=9mf5eys2icpimbw7p3rfq6aa4&dl=1)
+
+## **Correlation tries to answer a few questions:**
+
+1.  Are two measurement variables related in a consistent, linear form?
+
+2.  If they are related, what is the direction of the relationship (positive or negative)?
+
+3.  What is the strength of their relationship (how tight is the data ellipse)?
+
+### Calculating Pearson's *r*
+
+The strength and direction of the relationship is described by a sample estimate called **Pearson's *r***, which estimates the parameter called $\rho$ (that's the Greek letter rho, [not]{.underline} a lower-case Roman letter p). The value of *r* and $\rho$ ranges from –1 to +1. Pearson's *r* is a sample estimate, like a sample mean or standard deviation. **First we calculate *r* and then we test for its significance*.***
+
+Simple linear correlation tests the hypotheses:
+
+H~0~: $\rho$ = 0\
+H~a~: $\rho$ ≠ 0
+
+Pearson's *r* is significant if it's sufficiently *different* than zero, as in the different data ellipses in these images:
+
+![](https://www.dropbox.com/scl/fi/rcp1dl2g28x919fzgqed5/signif-of-r.png?rlkey=5e9gsadbu7pkidd11z1i5a66o&dl=1)
+
+> In these examples, when
+>
+> -   *r* = 0.0, there's no recognizable linear relationship
+>
+> -   *r* = 0.5, there is slightly positive linear relationship
+>
+> -   *r* = -0.7, there is stronger negative linear relationship
+>
+> -   *r* = 0.9, there is an even stronger positive linear relationship.
+
+Simple linear correlation has some **assumptions**, as usual:
+
+-   bivariate random sampling from the population of interest
+
+-   both variables are numerical (measured at the ratio or at least interval scale)
+
+-   both variables are approximately normally-distributed
+
+    -   or if they aren't, they can be transformed to make them normal
+
+-   the relationship between the two variables is linear
+
+    -   *but* transformation may remove linearity—we have to re-check after transformation
+
+\
+
+------------------------------------------------------------------------
+
+## Example of parametric linear correlation
+
+How birds fly (by powered flight or gliding or soaring, etc.) depends on the proportions of the parts of their wing and the size of their body. Consider a study of the ratios of bird wings and tail feathers. The data here show the relationship between the length of the feathers of the wing and the feathers of the tail (in mm) of 12 hummingbirds.
+
+```{r}
+# Bring in the data
+birds <- read.csv("https://github.com/ericdewar/biostats/raw/refs/heads/master/birds.csv")
+```
+
+First, we check for normality for X and Y:
+
+```{r}
+# check for normality
+shapiro.test(birds$wing)
+shapiro.test(birds$tail)
+```
+
+Looks good so far. Now let's plot the data.
+
+```{r}
+# Make a scatter plot. We set it up in the format Y ~ X.
+plot(tail ~ wing, data = birds, 
+     pch = 16, cex = 1.5, col = "blue2", pty = "s",
+     xlab ="Wing feather length (mm)", ylab = "Tail feather length (mm)")
+
+# pch means `plot character 16`, which is a filled-in circle
+# cex means `character expand by 1.5`, making it 50% bigger than the default
+```
+
+Okay, so we see that generally what we call the "data ellipse" in the scatter plot has a positive slope, so we'd tentatively say that it has a positive correlation, but let's calculate Pearson's *r* now with `cor.test`.
+
+```{r}
+# Do the correlation test and make it an object
+birdsCor <- cor.test(birds$tail, birds$wing)
+
+# Inspect the results of the correlation test
+birdsCor
+```
+
+This output tells us on the last line that the sample correlation test statistic *r* = 0.72, so we agree that it's a positive slope, but is it significantly different than 0?
+
+To answer that, the function `cor.test` also does a *t* test to see if Pearson's *r* is significantly different than 0 (or H~0~: $\rho$ = 0) and in this case finds a highly significant *P* = 0.008. Notice that it has 10 degrees of freedom: df = (# of X–Y pairs) – 2. It even helpfully gives the 95% CI, which obviously doesn't include 0 because H~0~ was rejected.
+
+::: callout-note
+You can do `cor.test` without making an object, but sometimes we want to use such an object later. If you just typed `cor.test(birds$tail, birds$wing)` into the console, you'd get the same output without making an object.
+:::
+
+### Nonparametric rank correlation using Spearman's *r*
+
+Real life happens and sometimes our data aren't normally distributed. Consider these data comparing exam scores in chemistry courses and biology courses. Is there a significant relationship between those two exam scores? Let's bring in the data and make a scatter plot:
+
+```{r}
+# Bring in the data
+exams <- read.csv("https://github.com/ericdewar/biostats/raw/refs/heads/master/exams.csv")
+
+# make a scatterplot 
+plot(bio ~ chem, data = exams, 
+     pch = 16, cex = 1.2, col = "red3", 
+     xlab = "Chemistry exam score", ylab = "Biology exam score")
+```
+
+Umm...maybe the slope is positive? It's hard to say because there's so much noise. The data are actually normal, but we'll apply the nonparamtric test as an example anyway. In this case we'll demonstrate the test here without making the object. You might also try a natural log transformation to see if that fixes the problem, but Spearman's rank method is solid.
+
+```{r}
+# test for normality first
+shapiro.test(exams$chem)
+shapiro.test(exams$bio)
+
+# add the 'spearman' argument to cor.test to do the rank-based calculation
+cor.test(exams$bio, exams$chem, method = "spearman")
+```
+
+Here we find that there is not a significant relationship between exam scores (*r~s~* = 0.56, *P* = 0.096). So, how well students did on biology exams doesn't seem to relate to how they did one chemistry exams.\
+
+::: callout-note
+Note that the format for Pearson's (parametric) *r* is (Y \~ X) while the setup for Spearman's (nonparametric) *r*~s~ is (Y, X).
+:::
+
+\
+\
+
+------------------------------------------------------------------------
+
+## Simple linear regression in R
+
+Simple linear regression [predicts]{.underline} a response variable's value (Y) based on the value of an explanatory variable (X). It's "simple" because it's only looking at a single explanatory variable; multivariate linear models also exist. A *strong* response of the Y variable will result in a scatter plot with a slope more different from 0 than one with a weaker (or nonsignificant) relationship. Unlike correlation, regression does assume a cause-and-effect relationship between X and Y.
+
+Regression makes a linear model to find the line that describes the relationship between the two variables. The method of "least squares" finds the equation for that line. The least squares method minimizes the differences (called residuals or residual error) between each point and the best-fit line.
+
+The equation for this line is
+
+$$
+Y=a+bX
+$$
+
+where *X* is the explanatory variable, *Y* is the response variable, *b* is the slope or rate of change, and *a* is the Y-intercept. We will be solving for the slope and the intercept.
+
+There are assumptions to regression, as you'd expect by now. These are assumptions about the response variable, as usual:
+
+-   at each $X_i$, there is a population of values of Y whose mean is on the "true" regression line
+
+-   at each $X_i$, the population of Ys is normal
+
+-   at each $X_i$, the variance of Y is the same
+
+-   at each $X_i$, the observations of Y are a random sample of the population of Y values
+
+In regression, we make no assumptions about X: it may be non-normal or fixed by the experimenter.
+
+Outliers can really change the slope, particularly when they're at the extremes of the range of X. A residual plot can be used to see if residuals are different across the range (more on this later). R will show the value of the residuals across five quantiles so that you can inspect it, at least.
+
+### Plotting data and finding the linear equation
+
+I have a dataset of lung capacities of my students that I have been accumulating since 2007. We suspect that there is a relationship between each person's height and their vital capacity. Let's plot it and do the linear model:
+
+```{r}
+# Bring in the data
+vc <- read.csv("https://raw.githubusercontent.com/ericdewar/biostats/refs/heads/master/vc.csv")
+
+# scatterplot of all data
+plot(capacity ~ height, data = vc, col = "firebrick", bty = "l", 
+     xlab = "Height (in.)", ylab = "Vital capacity (mL)", 
+     xlim = c(58, 76), ylim = c(1500, 6500))
+```
+
+That's fine if we had a single grouping variable. Want to show the difference between the outcomes for women and men? First plot one group with `plot()` and the others using `points()`. Some notes:
+
+-   `bty = "l"` indicates that you want the box around the plot to be an L shape.
+
+-   For choosing plotting characters, `pch = 1` is for an open circle and `pch = 0` yields an open square. See the help in R under `pch` for your options.
+
+```{r}
+# Make a scatterplot with different icons for female and male participants. Plot female participants first:
+plot(vc$capacity[sex=="F"] ~ vc$height[sex=="F"], data = vc, 
+     pch = 1, col = "goldenrod", bty = "l", 
+     xlab = "Height (in.)", ylab = "Vital capacity (mL)", 
+     xlim = c(58, 76), ylim = c(1500, 6500))
+
+# add male participants onto the rest of the plot
+points(vc$capacity[vc$sex=="M"] ~ vc$height[vc$sex=="M"], pch = 0, col = "blue")
+
+# Add the legend with icons
+legend("topleft", # Position of the legend
+       legend = c("Women", "Men"), # Text labels for the legend
+       col = c("goldenrod", "blue"), # Colors corresponding to the lines
+       pch = c(1, 0), # Point characters (icons) corresponding to the lines
+       cex = 0.8) # Size of the legend text and icons
+```
+
+-   The double equal signs (as in `[sex=="F"]` above) indicate *identity* to pick your groups.
+
+Okay, so let's do the linear model using `lm`. For this we'll make a new object and then get the reporting about it. I'll unpack it below.
+
+```{r}
+# Calculate the linear model, in the form lm(Y ~ X, data = name_of_dataframe)
+
+vcRegression <- lm(capacity ~ height, data = vc)
+
+
+# call for the reporting about the regression/LM
+summary(vcRegression)
+```
+
+-   Notice that here I run the regression using the linear model function `lm` and save the linear model as an object. This way I can interrogate it to get the summary or run an ANOVA on it to test hypotheses.
+
+### Testing hypotheses about the slope and intercept
+
+Regression is not an hypothesis test by itself. It uses *t* and *F* to determine if the slope of the line is significantly different from 0. The reporting also tells us if the y-intercept is different from 0 too, but that's usually not as critical for our kinds of questions.
+
+![](https://www.dropbox.com/scl/fi/glpb3fnx9y4skxekessqn/regr.png?rlkey=xc81kybku1yj5yndpw2v69px9&dl=1)
+
+There is a lot of reporting in the output above; let's break it down. (I used [this website](https://feliperego.github.io/blog/2015/10/23/Interpreting-Model-Output-In-R) as a basis for this section.)
+
+**Formula Call**
+
+The first item shown in the output is the formula R used to fit the data. R nerds call this the "call."
+
+**Residuals**
+
+Residuals are the difference between the observed response values and the response values that the model predicted. The `Residuals` section of the model output breaks it down into 5 summary points. When assessing how well the model fit the data, look for a symmetrical distribution across these points on the mean value zero (0). Our data set are reasonably symmetrical through each quantile, at least by eye. It goes from negative to positive, but that's okay—we expect that the point ($\overline{X}, \overline{Y}$) should have a residual close to 0 while we have negative residuals for smaller values of X and positive residuals for larger values of X.
+
+**Coefficients**
+
+The next section in the model output talks about the coefficients of the model. Theoretically, in simple linear regression, the coefficients are two unknown constants that represent the intercept and slope terms in the linear model. For our data, `(Intercept)` represents the Y-intercept (*a*) of our best-fit line and `height` represents the slope (*b*). The `t value` shows how far each value is from 0 (a is \~12 SD below 0 and b is \~18 SD higher). The *P*-values for those two statistics max out R's *P*-value calculator. In particular, we are interested in the *significance* of the slope: in order for the relationship to be meaningful, the slope needs to be sufficiently greater (or less) than 0.
+
+Here, we're seeing a strongly positive slope, showing that taller people have a larger vital capacity than shorter people. Really this means that taller people have a chest cage with a larger volume, and *that* yields the larger VC.
+
+> **What would a non-significant result mean?** Imagine instead that we were comparing height with the number of feet my students had. Regardless of their height, all students had two feet, so the slope would be 0, indicating a non-significant (or non-causal) relationship between height and number of feet.
+
+**Multiple R-squared, Adjusted R-squared**
+
+The *R*^2^ statistic ([not]{.underline} the same thing as Pearson's *r* or Spearman's *r*~s~) provides a measure of how well the model is fitting the actual data. It takes the form of a proportion of variance. This is somewhat similar to the way that we use Pearson's *r* in correlation by describing the "tightness" of the data ellipse.
+
+*R*^2^ is a measure of the linear relationship between our predictor variable (height) and our response / target variable (capacity). It always lies between 0 and 1 (i.e.: a number near 0 represents a regression that does not explain the variance in the response variable at all and a number close to 1 does explain the observed variance in the response variable closer to 100%).
+
+In our example, the *R*^2^ we get is around 0.5, so roughly half of the variance found in the response variable `capacity` can be explained by the predictor variable `height`. This might lead you to believe that there might be other variables that would also affect VC. It's hard to say what the exact cutoff is, though. That will probably depend on the application.
+
+::: callout-note
+In multiple regression settings, the *R*^2^ will always increase as more variables are included in the model. That’s why the adjusted *R*^2^ is the preferred measure as it adjusts for the number of variables considered.
+:::
+
+**F-Statistic**
+
+The *F*-statistic is a good indicator of whether there is a relationship between our predictor and the response variables. The further the *F* is from 1 the better it is. However, how much larger the *F* needs to be depends on both the number of data points and the number of predictors. Generally, when the number of data points is large, an *F* that is only a little bit larger than 1 is already sufficient to reject the null hypothesis (H~0~: There is no relationship between height and capacity). The reverse is true as if the number of data points is small, a large *F* is required to be able to ascertain that there may be a relationship between predictor and response variables. In our example the F-statistic is 342.3 which is significantly larger than 1 given the size of our sample.
+
+You have the basic result from this `summary` function, but to see the full ANOVA table, do this:
+
+```{r}
+anova(vcRegression)
+```
+
+`confint` will give you the confidence interval for each statistic (95% by default):
+
+```{r}
+confint(vcRegression)
+```
+
+### Plotting the least-squares line with confidence interval bands for the slope
+
+After you have made the regression object, you can use it to plot the least-squares line. There is a way to make the plot in base R, but I prefer to it using the `ggplot2` package.
+
+A caution: it's **always a bad idea to extrapolate beyond your observed data**. The relationship we recovered here works well to describe people with adult-proportioned bodies, but the same equation is not likely to be true for, say, infants or young children.
+
+So this slope could be as high as 176 mm^3^/in or as low as 142 mm^3^/in and still be significant. We show this graphically by making the confidence bands. In this case, I prefer the plotting function using the `ggplot2` package. It also has the advantage of only plotting the best-fit line over the range of the observed data.
+
+```{r}
+# install.packages("ggplot2") ## only need this once; I made this a comment to avoid repeated installations
+
+# 95% CI using ggplot (all one color)
+library(ggplot2)
+ggplot(vc, aes(height, capacity)) + 
+        geom_point(size = 3, col = "firebrick") +
+        geom_smooth(method = "lm", se = TRUE, col = "black") +
+        labs(x = "Height (in.)", y = "Vital capacity (mL)") + 
+        theme_classic()
+```
+
+These confidence bands are very close to the least-squares line. That's good, and expected, because the *P*- value on the significance tests were so high. Notice that they're closer at point ($\overline{X}, \overline{Y}$) than at the extremes of the range of X.
+
+### Confidence intervals for predictions
+
+Once we have calculated the linear model, we can also get the 95% CI for the predicted value of the outcome variable for a given explanatory value (called the prediction interval). To get the 95% prediction interval for a person from the vital capacity dataset who is 5'11" tall:
+
+```{r}
+# 95% CI for predictions for Yi at a given X
+
+newdata = data.frame(height = 71) # make a little data frame for the value of interest
+
+predict(vcRegression, newdata, interval = "predict") # predict Yi using the linear model object
+```
+
+\
+The predicted value based on the sample estimates is the `fit` column, followed by the lower and upper bounds of the 95% prediction interval.
+
+```{r}
+newdata1 = data.frame(height = c(64, 66, 68)) # can also predict CIs for several Yi values
+predict(vcRegression, newdata1, interval = "predict")
+
+newdata2 = data.frame(height = c(60:72)) # can also predict CIs for a range of Yi values
+predict(vcRegression, newdata2, interval = "predict")
+```
+
+\
+\
+
+------------------------------------------------------------------------
+
+### Beware nonlinear data!
+
+If plotting your data shows that they are visually nonlinear, **you must transform them** to do linear regression. There are "smoothing" techniques that are also helpful, but we'll stick with transformations of power curves and exponential curves.
+
+**Power curves** have the form Y=aX^b^. Make them linear by **ln-transforming X and Y and then doing the linear model on those transformed variables.**
+
+Remember that you can make a new column with the transformed data by using a function like:
+
+```{r}
+vc$lnheight <- log(vc$height)
+```
+
+Exponential curves have the form Y=ab^X^. Make them linear by **ln-transforming Y and X and then calculating the linear model on the transformed Y vs. X.**

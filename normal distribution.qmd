@@ -1,0 +1,154 @@
+---
+title: "Normal distribution"
+author: "Eric W. Dewar"
+format: docx
+editor: visual
+---
+
+## The Normal Distribution
+
+When we collect enough ratio-scale data, we often see that our sample's frequencies are distributed normally.
+
+The normal distribution (ND) is special because has universal properties. Not every apparently "bell-shaped" curve is truly normal, but the ones that are normal have these attributes in common that allow us to do statistical tests with them:
+
+-   The **ND is defined by** $\mu$ **and** $\sigma$ (or $\bar{Y}$ and *s* for samples). The height of the curve is a probability density function, but statisticians have used calculus to integrate the area under the curve from some observation $Y_{i}$ to another observation—knowing this area allows us to assign a probability to the range, and that we can use to inform statistical tests.
+
+-   The **ND is perfectly symmetrical about its height** of its peak, which is also the location of the mean, median, and mode of the distribution.
+
+-   The **ND has known proportions that let us assess the probability of an outcome**. The total area under the curve is 100% or 1.0, and:
+
+    -   ± 1 SD = \~66% of the area under the curve
+
+    -   ± 1.96 SD = 95% of the area under the curve
+
+    -   ± 3 SD = \~99% of the area under the curve\
+        \
+
+------------------------------------------------------------------------
+
+### 1. The *Z* score (standard normal deviate)
+
+When both $\mu$ and $\sigma$ of a population is known, we can use this score to predict the placement of a given observation in relation to the mean. The equation is
+
+$$
+Z = \frac{Y_i - \mu}{\sigma}
+$$
+
+Where $Y_{i}$ is a given observation, $\mu$ is the population mean, and $\sigma$ is the population standard deviation. The *Z*-score gives the placement of your observed $Y_{i}$ along the X axis. From there we can calculate the area from there under the curve.
+
+First, let's get a sample from a normal distribution with $\mu$ and $\sigma$ by sampling 10,000 numbers from a population with a mean of 100 and an SD of 5:
+
+```{r}
+# make a vector that is a large sample from an ND
+mydata <- rnorm(n=10000, mean=100, sd=5)
+```
+
+Here are some sample statistics ($\bar{Y}$ and s); they probably won't exactly match our population exactly because this is a sample from the population, but they should be close. You can run the block above and the one below this to see how it changes if you repeatedly make new samples and report the sample statistics.
+
+```{r}
+# report the sample statistics
+mean(mydata) 
+sd(mydata)
+```
+
+Make a histogram of your sample. Note that **freq = FALSE** will give the density function; leaving out that argument will make the Y-axis frequency rather than probability density
+
+```{r}
+# histogram of the sample
+hist(mydata, main ="", col = "goldenrod1", xlim = c(80, 120), freq = FALSE, xlab = "") 
+```
+
+We can also add a density curve to estimate the population distribution. If we could observe every member of the population (or sample infinitely from it, I suppose) this line should be the true distribution of the population's outcomes. The **`curve`** function will overlay a smoothed line over the histogram in the plot pane. The argument **`add = TRUE`** overlays the curve on your existing histogram **`lwd=3`** specifies the width of the line.
+
+```{r}
+# histogram of the sample again
+hist(mydata, main ="", col = "goldenrod1", xlim = c(80, 120), freq = FALSE, xlab = "") 
+
+# then plot a smooth curve approximating the population
+curve(dnorm(x, mean=mean(mydata), sd=sd(mydata)), add=TRUE, col="darkblue", lwd=3)
+```
+
+------------------------------------------------------------------------
+
+### 1.1 An example of using the *Z* score
+
+Imagine that this sample came from observations of the weights of newborn domestic shorthair cats. If a kitten named **Alice** weighed exactly 100 g, then
+
+$$
+Z = \frac{100-100}{5} = 0
+$$
+
+The *Z*-score is 0. Note that I think that it helps to sketch out a normal distribution on paper to make sure that we can visualize how our data compare to the mean and which area under the curve we are looking to estimate.
+
+Now use `pnorm` to give the P-value for a given *Z* score. The argument **`lower.tail = TRUE`** specifies that we want the area of the curve to the left of (smaller than) the observation. **`lower.tail = FALSE`** gives the area to the right of (larger than) the observation.
+
+```{r}
+pnorm(100, mean = 100, sd = 5, lower.tail = TRUE)
+```
+
+When the *Z* score is 0 that means that [50% of the area under the curve]{.underline} is to the left of Alice's weight because she's right at $\mu$.
+
+We weigh another cat, **Bernie**, who weighs 105.6 g, so
+
+$$
+Z = \frac{105.6-100}{5} = 1.12
+$$
+
+```{r}
+pnorm(105.6, mean = 100, sd = 5, lower.tail = TRUE)
+```
+
+When Z = 1.12, [87% of the curve]{.underline} lies to the left of that observation.
+
+But what about **Casey**, a kitten born at 97.3 g? Her place along the distribution is
+
+$$
+Z = \frac{97.3-100}{5} = -0.29
+$$
+
+```{r}
+pnorm(97.3, mean = 100, sd = 5, lower.tail = TRUE)
+```
+
+This gives me Casey's percentile weight: 29% of the population would be smaller than her and 71% would be larger.
+
+By now you've noticed that The Z-score is an intermediary between the raw observation and the observation's place along the distribution. In R we skip that step by going right to the P-value of that observation (or the percentile of that observation in the distribution).
+
+One last use of the *Z* test is not just the placement of individual points along the curve, but the area of the curve *between* two observations on the curve.
+
+What percentage of cats would be expected to be between Casey and Bernie?
+
+So we're comparing Casey (at the \~30th percentile) with Bernie (at the \~87th percentile). In R this could be done like
+
+```{r}
+c <- pnorm(97.3, mean = 100, sd = 5, lower.tail = TRUE)
+b <- pnorm(105.6, mean = 100, sd = 5, lower.tail = TRUE)
+b - c
+```
+
+So 57.4% of kittens should be between Casey and Bernie in birth weight. It's a good idea to sketch out a curve so that we can keep straight what areas we're subtracting.\
+\
+
+------------------------------------------------------------------------
+
+## 2. Testing hypotheses with the *Z* score
+
+The *Z* score gives us probabilities of outcomes. Once we get toward the tails of the distribution (past *Z* = 1.96), the probabilities start to get smaller fast.
+
+Consider the cats from above and imagine that we had one big cat (**Dario**) whose birth weight was 115.6 g. Is Dario significantly larger than the rest of the kittens from this population? This is a one-tailed test because I think that he's bigger than other kittens, not just "different" in size. Let's set our significance level at $\alpha$ = 0.01.
+
+H~0~: Dario is smaller or equal in birth weight to other kittens ($\mu$ ≤ 0).
+
+H~a~: Dario is larger than these other kittens ($\mu$ \> 0).
+
+```{r}
+pnorm(115.6, mean = 100, sd = 5, lower.tail = FALSE)
+```
+
+Yikes. The probability of getting a domestic shorthair kitten this chonky when the mean weight is 100 g with a standard deviation of 5 g is P = 0.0009. This is much less than our confidence level of 0.01, so we can say, no, this cat would be not a part of the reference population. Maybe it's some bigger breed like a Maine Coon or something, but it's really unusual for a member of the population (domestic shorthair newborns) we've been referring to. Furthermore, we'd expect to be wrong in our conclusion far less than 1% of the time because P = 0.0009.\
+
+------------------------------------------------------------------------
+
+## 3. Conclusion
+
+The *Z* test is a very powerful test for ratio-level data [when we have a lot of parametric knowledge]{.underline} (i.e., both the parametric mean and parametric SD). However, in practice we usually don't know everything about our reference population (particularly the SD). Luckily, we have another test (the *t* test) that can help us in those situations by estimating the standard deviation based on our sample.

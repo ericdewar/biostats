@@ -1,0 +1,324 @@
+---
+title: "nonlinear regression"
+format: html
+editor: visual
+---
+
+# Approaches to nonlinear regression
+
+## Doing some regression diagnostics
+
+Recall in linear aggression we assume that there is a consistent linear relationship between the value of an outcome variable for a given explanatory variable.
+
+Here is the vital capacity dataset again. We'll remake the model and the main reporting plots:
+
+```{r}
+# Bring in the vital capacity data
+vc <- read.csv("https://raw.githubusercontent.com/ericdewar/biostats/refs/heads/master/vc.csv")
+
+# Calculate the linear model, in the form lm(Y ~ X, data = name_of_dataframe)
+vcRegression <- lm(capacity ~ height, data = vc)
+
+# call for the reporting about the regression/LM
+summary(vcRegression)
+
+# plot the 95% CI for the slope
+library(ggplot2) # activate functions
+
+ggplot(vc, aes(height, capacity)) + 
+        geom_point(size = 3, col = "firebrick") +
+        geom_smooth(method = "lm", se = TRUE, col = "black") +
+        labs(x = "Height (in.)", y = "Vital capacity (mL)") + 
+        theme_classic()
+
+# plot the prediction intervals
+vc2 = data.frame(vc, predict(vcRegression, interval = "prediction"))
+
+ggplot(vc2, aes(height, capacity)) + 
+    geom_ribbon(aes(ymin = lwr, ymax = upr, fill='prediction'), 
+        fill = "black", alpha = 0.2) +
+    geom_smooth(method = "lm", se = FALSE, col = "black") +
+    geom_point(size = 3, col = "firebrick") + 
+    labs(x = "Height (in.)", y = "Vital capacity (mL)") + 
+    theme_classic()
+```
+
+Remember that `summary` gives this information:
+
+-   The **residuals**: the error of the model along 5 points. We are looking for symmetry (or you can check for linearity below).
+
+-   The **tests on the significance of the slope** (both *t* and *F* given)
+
+-   The **R^2^**, which shows how much of the variation in Y is described by X. (This is similar to what *r* tells us in correlation)
+
+::: callout-warning
+Note that you should **never** predict an outcome value outside your observed range of predictor values.
+:::
+
+For example, what if you wanted to apply the linear model to one of those huge halloween skeleton displays? Or to a newborn 20 in. long?
+
+```{r}
+# 95% CI for predictions for Yi at a given X
+
+newdata1 = data.frame(height = 144, capacity = NA)
+predict(vcRegression, newdata1, interval = "predict") 
+
+```
+
+```{r}
+
+newdata2 = data.frame(height = 20) 
+predict(vcRegression, newdata2, interval = "predict") 
+```
+
+That is a problem. A negative vital capacity is biologically meaningless. Infants must have different scaling rules than adults. (Back in the 1970s, the linear model was calculated as
+
+### Detecting nonlinearity
+
+I'm a little embarrassed to say that I lied to you about these data. It turns out that adults lie to each other all the time, but scientists shouldn't. The Y variable isn't *actually* normally distributed, so one of the assumptions of linear regression wasn't upheld.
+
+Let's check the **capacity** variable. Additionally, you can make a quick residual plot in base R to look for linearity.
+
+```{r}
+# test for normality on Y
+shapiro.test(vc$capacity)
+
+# make a residual plot
+plot(vcRegression, which = 1)
+```
+
+Can we fix it? Let's try a transformation to try to make it better.
+
+```{r}
+# transform both axes
+vc$LNheight <- log(vc$height)
+vc$LNcapacity <- log(vc$capacity)
+
+shapiro.test(vc$LNcapacity)
+```
+
+That's better. Let's run a linear model on the transformed data and then compare the residual plots.
+
+```{r}
+# regression on transformed data
+vcLNRegr <- lm(vc$LNcapacity ~ vc$LNheight, data = vc)
+summary(vcLNRegr)
+
+# compare residual plots
+par(mfrow = c(1, 2)) # puts plots side by side  (1 row, 2 columns)
+plot(vcRegression, which = 1, main = "untransformed")
+plot(vcLNRegr, which = 1, main = "ln transformed")
+```
+
+It doesn't look too bad, but some low values seem to be pulling up the residuals. Another way to visualize this is with a component-plus-residual plot. Note that `car` refers to the package called "Companion to Applied Regression." We use the double-colon syntax to specify that we want to use this function from this particular package.
+
+```{r}
+car::crPlots(vcLNRegr,
+             pch=20, col="gray",
+             smooth = list(smoother=car::gamLine))
+
+```
+
+The dashed line would be perfectly linear data. Our actual VC data (in pink) looks okay.
+
+Common nonlinear relationships that can usually be fixed by natural-log transformation include power functions and exponential functions.
+
+![](https://www.dropbox.com/scl/fi/xt99c967m3acz54zrbk6a/nonlinear.jpg?rlkey=hl4wql0vvy75em3mb6qgaak1p&dl=1){fig-align="center" width="350"}
+
+But as always, remember to un-transform your data to the original units after any predictions.\
+
+------------------------------------------------------------------------
+
+## Nonlinear regression
+
+Not all bivariate data are appropriate to use for linear regression, even after transformation. Here are a few examples.
+
+### Michaelis-Menten curve
+
+This relationship is common with growth-rate data, and is comonly seen in biochemistry. The equation is
+
+$$
+Y = \frac{aX}{b+X}
+$$
+
+Let's fit a nonlinear regression curve having an asymptote (Michaelis-Menten curve). The data shown are the relationship between population growth rate of a phytoplankton in culture and the concentration of iron in the medium.
+
+```{r}
+# bring in the data
+phytoplankton <- read.csv(url("http://www.zoology.ubc.ca/~schluter/WhitlockSchluter/wp-content/data/chapter17/chap17f8_1IronAndPhytoplanktonGrowth.csv"))
+
+# make a scatter plot to look for linearity
+plot( phytoGrowthRate ~ ironConcentration, data = phytoplankton, pch = 16, 
+      col = "firebrick", las = 1, cex = 1.5, bty = "l", 
+      ylab = "Growth rate (no./day)",
+      xlab = expression(paste("Iron concentration (", mu, "mol)")) )
+
+```
+
+Visually it doesn't look very linear. It is possible to fit a curve that would pass through all these points, but it is very unlikely that particular curve would have much predictive value. We are able to fit these data with a simpler function that starts with a Y-intercept at 0.0 and then increases to saturation with a decreasing slope.
+
+We'll fit a Michaelis-Menten curve to the phytoplankton data using the `nls` (nonlinear least squares) function. To fit the curve, provide a formula that also includes symbols for the parameters to be estimated. In the following function, we use "a" and "b" to indicate the parameters of the Michaelis-Menten curve we want to estimate. The function includes an argument where we must provide an initial guess of parameter values. The value of the initial guess is not so important—here we choose a=1 and b=1 as initial guesses.
+
+The first function below carried out the model fit and save the results in an R object named phytoCurve.
+
+```{r}
+phytoCurve <- nls(phytoGrowthRate ~ a*ironConcentration / (b+ironConcentration), 
+                  data = phytoplankton, list(a = 1, b = 1))
+
+# Obtain the parameter estimates using the summary command to, including 
+#   standard errors and t-tests of null hypotheses that parameter values are zero.
+summary(phytoCurve)
+
+# Now we can add the nonlinear regression curve to scatter plot. We'll start with the plotting function from the previous block.
+
+plot( phytoGrowthRate ~ ironConcentration, data = phytoplankton, pch = 16, 
+      col = "firebrick", las = 1, cex = 1.5, bty = "l", 
+      ylab = "Growth rate (no./day)",
+      xlab = expression(paste("Iron concentration (", mu, "mol)")) )
+
+xpts <- seq(min(phytoplankton$ironConcentration), 
+            max(phytoplankton$ironConcentration), length.out = 100)
+ypts <- predict(phytoCurve, new = data.frame(ironConcentration = xpts))
+lines(xpts, ypts)
+```
+
+Many of the functions that can be used to extract results from a saved lm object work in the same way when applied to an nls object, such as `predict`, `residuals`, and `coef`.
+
+### Quadratic curves
+
+“Humped” data like the case at the right sometimes come up in biology. It is possible to fit this parabolic curve with a quadratic (second-degree polynomial) equation.
+
+This approach is most justified if the data are fairly symmetrical. Consider these data that show the relationship between the number of plant species present in ponds and pond productivity.
+
+```{r}
+# bring in the data
+pondProductivity <- read.csv(url("http://www.zoology.ubc.ca/~schluter/WhitlockSchluter/wp-content/data/chapter17/chap17f8_2PondPlantsAndProductivity.csv"))
+
+# make a scatter plot to look for linearity
+plot(species ~ productivity, data = pondProductivity, pch = 16, 
+     col = "firebrick", las = 1, cex = 1.5, bty = "l", 
+     ylab = "Number of species", xlab = "Productivity (g/15 days)" )
+
+
+```
+
+Now we actually fit a quadratic curve to the data. Here, the single variable productivity in the data frame is included in the formula both as itself and as the squared term, `productivity^2.` To make the squared term work, we need to "wrap" or "insulate" the term with `I()`. The results of the model fit are saved in an R object called productivityCurve.
+
+```{r}
+productivityCurve <- lm(species ~ productivity + I(productivity^2), 
+                        data = pondProductivity)
+
+# Show estimates of the parameters of the quadratic curve (regression coefficients) 
+#   are obtained as follows, along with standard errors and t-tests.
+summary(productivityCurve)
+
+# Add quadratic regression curve to scatter plot. We'll redraw the plot in this block.
+plot(species ~ productivity, data = pondProductivity, pch = 16, 
+     col = "firebrick", las = 1, cex = 1.5, bty = "l", 
+     ylab = "Number of species", xlab = "Productivity (g/15 days)" )
+
+xpts <- seq(min(pondProductivity$productivity), max(pondProductivity$productivity), 
+            length.out = 100)
+ypts <- predict(productivityCurve, new = data.frame(productivity = xpts))
+lines(xpts, ypts)
+```
+
+### Smoothing
+
+Software is able to fit a curve without specifying a formula. Several methods exist, with names like “kernel,” spline,” and “loess.”
+
+The formula takes information from nearby data points to estimate the best-fit line. One can specify the complexity of the formula by setting the effective degrees of freedom.
+
+Here we fit a formula-free curve (cubic spline) to the relationship between body length and age for a large sample of female fur seals.
+
+```{r}
+# bring in the data
+shrink <- read.csv(url("http://www.zoology.ubc.ca/~schluter/WhitlockSchluter/wp-content/data/chapter17/chap17e8ShrinkingSeals.csv"))
+
+# make a scatter plot to look for linearity
+plot(jitter(length, factor = 2) ~ ageInDays, data = shrink, pch = ".", 
+     col = "firebrick", las = 1, bty = "l", ylab = "Body length (cm)",
+     xlab = "Female age (days)")
+```
+
+Now we fit a cubic spline. The argument `df` stands for effective degrees of freedom, which allows you to control how complicated the curve should be. The simplest possible curve is a straight line, which has df=2 (one for slope and another for intercept). More complex curves require more degrees of freedom. Here we fit a very complicated curve.
+
+```{r}
+shrinkCurve <- smooth.spline(shrink$ageInDays, shrink$length, df = 400)
+
+# Add curve to scatter plot, again we start by redrawing the plot.
+plot(jitter(length, factor = 2) ~ ageInDays, data = shrink, pch = ".", 
+     col = "firebrick", las = 1, bty = "l", ylab = "Body length (cm)",
+     xlab = "Female age (days)")
+
+xpts <- seq(min(shrink$ageInDays), max(shrink$ageInDays), length.out = 1000)
+ypts <- predict(shrinkCurve, xpts)$y
+lines(xpts, ypts)
+```
+
+### Logistic regression
+
+Common when handling binary (0/1) outcomes with several different treatments, like a dose-response curve. Linear regression is unsuitable because binary outcomes violate three of the assumptions. Logistic regression uses a general linear model to handle these constraints of data.
+
+Here the example is about the relationship between mortality of guppies and the duration of their exposure to a temperature of 5° C.
+
+```{r}
+# bring in the data
+guppy <- read.csv(url("http://www.zoology.ubc.ca/~schluter/WhitlockSchluter/wp-content/data/chapter17/chap17f9_1GuppyColdDeath.csv"))
+
+# Draw a frequency table of mortality at different exposure times.
+table(guppy$mortality, guppy$exposureDurationMin, 
+      dnn = c("Mortality","Exposure (min)"))
+
+# make a stripchart to inspect
+plot(jitter(mortality, factor = 0.1) ~ jitter(exposureDurationMin, factor = 1),  
+     data = guppy, col = "firebrick", las = 1, bty = "l", ylab = "Mortality",
+     xlab = "Duration of exposure (min)")
+```
+
+Now we fit the logistic regression model with the function `glm`.
+
+```{r}
+guppyGlm <- glm(mortality ~ exposureDurationMin, data = guppy,
+                family = binomial(link = logit))
+
+# Add logistic regression curve to scatter plot.
+plot(jitter(mortality, factor = 0.1) ~ jitter(exposureDurationMin, factor = 1),  
+     data = guppy, col = "firebrick", las = 1, bty = "l", ylab = "Mortality",
+     xlab = "Duration of exposure (min)")
+
+xpts <- seq(min(guppy$exposureDurationMin), max(guppy$exposureDurationMin), 
+            length.out = 100)
+ypts <- predict(guppyGlm, newdata = data.frame(exposureDurationMin = xpts), 
+                type = "response")
+lines(xpts, ypts)
+
+# Table of regression coefficients, with parameter estimates
+summary(guppyGlm)
+
+# 95% confidence intervals for parameter estimates. It is necessary to load the MASS package first. 
+library(MASS)
+confint(guppyGlm)
+
+```
+
+```{r}
+# Predict probability of mortality (mean mortality) for a given x-value, 10 min duration, including standard error of prediction.
+
+predict(guppyGlm, newdata = data.frame(exposureDurationMin = 10),
+        type = "response", se.fit = TRUE)
+```
+
+```{r}
+# Estimate the LD50, the dose at which half the individuals are predicted to die from exposure.
+library(MASS)
+dose.p(guppyGlm, p = 0.50)
+```
+
+```{r}
+# Analysis of deviance table, with a of the null hypothesis of zero slope 
+anova(guppyGlm, test = "Chi")
+```
+
+\
+Next time we'll talk about multiple explanatory variables and generalizing the linear model for more complicated ANOVA designs.

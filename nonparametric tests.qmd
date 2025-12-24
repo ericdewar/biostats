@@ -1,0 +1,339 @@
+---
+title: "Nonparametric tests"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+## What happens when your data fail your test's assumptions?
+
+All the tests we've seen so far have been developed for data sets that conform to certain predictions, like a normal or binomial distribution. If you had a sample that didn't follow one of these distributions, or failed to align with another assumption of a test, then what would happen is that your chance of making a Type I error increases—you'd "cheat" the test—and in doing so reach a conclusion that is meaningless. Of course, this defeats the purpose of using statistics.\
+
+## **Recognizing non-normality**
+
+As it turns out, R doesn't generate *truly* random numbers. Functions like `sample` ,`runif`, and `rnorm` and others do what are called "pseudorandom" numbers based on a starting "seed." I could have used the `random` package in R that does make truly random numbers but I wanted to make a static example for this tutorial. Here is a sample of random numbers I pulled from [random.org](http://random.org/):
+
+```{r}
+demo <- c(14, 1, 34, 93, 20, 90, 88, 15, 34, 98)
+mean(demo) 
+sd(demo) 
+hist(demo, col = "orange", main = "", breaks = seq(0,100, by = 4))
+```
+
+So those are truly random numbers between 1 and 100—we would expect their mean to be about 50. Next I had R choose 40 random numbers drawn from a normal distribution, and I got this:
+
+```{r}
+demo2 <- rnorm(40, mean = 50, sd = 10)
+
+hist(demo2, col = "orange", main = "", breaks = seq(0,100, by = 4))
+```
+
+The second histogram clearly looks more normally-distributed, and that's not surprising—I pulled a larger sample size *and* I specified that it should be normal, as opposed to a random sample without a distribution.
+
+Graphical plots like histograms are good for visually assessing normality. You've already seen that R has another built-in graphical method called the normal quantile plot, which plots your data against a hypothetical normal distribution. Compare the two samples from above:
+
+```{r}
+par(mfrow = c(1, 2)) # sets the graphics parameters so that there are two side-by-side plots
+
+qqnorm(demo, main = "demo", datax = TRUE) 
+qqnorm(demo2, main = "demo2", datax = TRUE)
+# datax = TRUE specifies that the sample data should go on the X axis
+```
+
+The Q-Q plot shows that `demo2` sample falls much closer to a straight line than the smaller sample does. But the `demo2` sample isn't exactly on a straight line, either. No matter what we should always run a formal test like the **Shapiro-Wilk test** which tests the null hypothesis that the data come from a normal distribution (or H~0~: data are normal).
+
+```{r}
+shapiro.test(demo)
+
+shapiro.test(demo2)
+```
+
+So, here we see that `demo` is not drawn from a normal distribution (*P* = 0.036) but `demo2` fails to reject H~0~, so we can conclude that it does come from a normal distribution (P \> 0.05).\
+
+------------------------------------------------------------------------
+
+## **What to do when you can't do a regular *t* test**
+
+### **Option 1: Run the *t* test anyway**
+
+What's the worst that could happen? It's not going to break your computer. The mean of my `demo` sample is 48.7 and the standard deviation is 38.75 (which is a really big SD). Let's see if my non-normal dataset is different from my expected mean of 50.
+
+```{r}
+t.test(demo, mu = 50)
+```
+
+Ugh. We can't reject the H~0~ of having a different mean than 50 (*P* = 0.92). Our sample is nowhere close to that.
+
+::: callout-important
+So, with this sample, even if we cheat the test we can't reject H~0~, so tells us that there really is no difference from the population mean of 50 for this non-normal sample.
+:::
+
+### **Option 2: Transform your data**
+
+Sometimes we can transform our data to try to make them normal. Biologists frequently encounter variables that have values across many orders of magnitude. Consider the example of brain size in mammals. Because we are very different in body size and cognitive ability, brain size ranges from at about 1/10 of a gram (0.176 g in some shrews) to 1500 g for people to about 7000 g in a blue whale. You can see this wide range of variability for the sample of mammals shown below.
+
+The histogram of brain masses (in grams) from a sample of these selected insectivores, rodents, and primates would look like this:
+
+```{r}
+brains <- c(0.176, 0.347, 0.416, 1.02, 0.802, 1.802, 0.999, 3.759, 7.78, 18.365, 10.15, 15.73, 1600, 30.22, 53.21, 87.36, 1508) 
+hist(brains, breaks = seq(0, 1600, by = 5), xlim = c(0, 2000), main = "", xlab = "Brain mass (g)")
+```
+
+This barely looks like a histogram; it's not normal at all because there are a bunch of small values and a few large ones (even removing the two large outliers it's skewed). This would fail to conform with the assumptions of a *t* test. But seeing how non-normal our data are because of the large range of values, we should try a transformation before giving up.
+
+There are lots of transformations that are possible, but the most common one in biology (particularly in morphometrics) to "flatten out: curved distributions is the natural-log transformation.
+
+Transform the original vector into a new object using `log` to do the natural-log transformation...
+
+```{r}
+lnbrains <- log(brains) # ln-transformation making a new object
+```
+
+...and then compare the normal quantile plots for the original data vs. the transformed data.
+
+```{r}
+par(mfrow = c(1, 2)) # sets the graphics parameters so that there are two side-by-side plots
+
+qqnorm(brains, main ="Linear brain masses") 
+qqnorm(lnbrains, main = "Transformed brain masses")
+```
+
+While it's not perfectly linear, the transformed sample called `lnbrains` looks a lot more normal. A Shapiro-Wilk test confirms this:
+
+```{r}
+shapiro.test(brains)
+shapiro.test(lnbrains)
+```
+
+So, the transformation is not perfect, but it's not so bad that it would make a *t* test choke, so let's do the parametric *t* test now.
+
+Let's say that the average mass of a mammals brain (thinking across all living species) is about 500 g. The raw linear sample of brain masses has a mean of about 200 g, but we know that the mean is highly susceptible to outliers so it might trick the *t* test. If we want to see if this transformed sample has a mean of \~500 g, we first need to transform 500 g into about 6.21 ln g. This unit (ln g) is awkward, but it's only needed while doing the stats.
+
+```{r}
+mean(brains)
+log(500)
+```
+
+Our hypotheses are:
+
+H~0~: $\overline{Y}$= 6.21 ln g\
+H~a~: $\overline{Y}$ ≠ 6.21 ln g
+
+```{r}
+t.test(lnbrains, mu = 5.3)
+```
+
+So, from this we conclude that our estimate of the parametric mean of brain size for these species is between 0.64 and 3.43 ln g, or 1.9 to 30.9 g when we recover the original units, a range very different from our guess of 500 g (*t* = -4.96, df = 16, *P* = 0.0001 (We would "un-transform" these values with the *e^x^* function on a calculator or in R with `exp`.)
+
+::: callout-important
+It's [always]{.underline} necessary to return your data to the original units when stating your conclusion.
+:::
+
+```{r}
+# un-transform the data
+
+exp(0.6428663)
+exp(3.4303768)
+```
+
+### Use a nonparametric alternative test
+
+#### The Sign test for one-sample *t* tests
+
+Almost every test has a non-parametric equivalent that lets you have a chance to answer questions with your rotten data. The **Sign test** is an alternative to either the one-sample or paired t test, but it works with the median instead of the mean. It tests these hypotheses:
+
+H~0~: The sample median is not different than the population mean (µ~0~)\
+H~a~: The sample median differs from µ~0~
+
+For paired tests, µ~0~ is usually zero. **The Sign test is identical to the binomial test** using *p* = 0.5 as the null probability of a hit. Use this test to calculate a probability for the observed outcome and all more extreme outcome combinations. Its only assumption is that you've sampled randomly from the population.
+
+The idea of this test is we are doing the over/under to compare two values. For a one-sample *t* test like my first example (`demo`) above, we would count the number of times that an observation was either above (+) or below (-) the hypothesized mean of 50:
+
+|                 |       |                          |
+|:---------------:|:-----:|:------------------------:|
+| **Observation** | $Y_i$ | **Comparison to µ = 50** |
+|        1        |  14   |            –             |
+|        2        |   1   |            –             |
+|        3        |  34   |            –             |
+|        4        |  93   |            \+            |
+|        5        |  20   |            –             |
+|        6        |  90   |            \+            |
+|        7        |  88   |            \+            |
+|        8        |  31   |            –             |
+|        9        |  24   |            –             |
+|       10        |  98   |            \+            |
+
+So, there are 6 – and 4 +. Fit those 6 hits into the binomial function, using *p* = 0.5.
+
+H~0~: Pr\[hit\] = 0.5\
+H~a~: Pr\[hit\] ≠ 0.5
+
+```{r}
+binom.test(6, n = 10, p = 0.5, alternative = "two.sided")
+```
+
+So we fail to reject the null hypothesis that the mean is different than 50 (or *p* = 0.5) because the 95% CI includes 0.5. Why not just use the *t* test result we got above? Because the sign test isn't being cheated when we do it this way—your conclusion is justified because you used this test that compares the medians instead.
+
+#### **The Sign test for paired *t* tests**
+
+Consider a drug that is being tested to see if it decreases the frequency of repetitive behaviors. The data here a sample of 10 subjects measured before and after one week on the drug.
+
+H~0~: There are fewer decreases or about the same number of increases and decreases of repetitive behaviors (*p* ≤ 0.5).\
+H~a~: There are more decreases of repetitive behaviors (*p* \> 0.5)
+
+```{r}
+## bring in the data
+repdrug <- read.csv(url("https://github.com/ericdewar/biostats/raw/refs/heads/master/rep-drug.csv"))
+View(repdrug)
+```
+
+R can count the frequencies of differences:
+
+```{r}
+# calculate a column of after - before differences
+repdrug$difference <- c(repdrug$after - repdrug$before) 
+
+## Are the data normal?
+shapiro.test(repdrug$difference)
+
+## Let R count the over/under values
+repdrug$result <- "equal" ## make this column first to set all rows as "equal"
+repdrug$result[repdrug$difference > 0] <- "above" ## register the increases
+repdrug$result[repdrug$difference < 0] <- "below" ## register the decreases
+repdrug$result <- factor(repdrug$result, levels = c("equal", "above", "below")) ## make those results into factors 
+
+table(repdrug$result) ## see the results
+```
+
+In case you're thinking that this is a lot of hassle for 8 observations, I would agree, but this workflow will work better than doing it by hand if you have 80 or 8000 observations. Okay, now do the sign/binomial test to see if you have more increases than decreases:
+
+```{r}
+binom.test(6, n = 8, p = 0.5, alternative = "greater")
+```
+
+The probability, then, of our observed outcome having more successes than failures and all the more extreme outcomes is 0.142, so we fail to reject H~0~. Notice that the observed probability (Pr\[hit\] = 0.75) is within the 95% CI.
+
+::: callout-important
+Understand this: If we had just done a parametric *t* test on those data, we would have rejected H~0~ (*t* = 2.06, df = 7, *P* = 0.039), but *that result would have been meaningless* because we would have cheated that test.
+
+Any nonparametric test has lower power than its corresponding "regular" parametric test. If you can discern differences with a parametric test without cheating, you will always reject H~0~ with a nonparametric test. On the other hand, nonparametric alternatives allow us to have some chance to work with data that otherwise would be untestable without cheating.
+:::
+
+#### Alternatives for a two-sample *t* test: the Mann-Whitney*-*Wilcoxon test and Welch's approximate *t* test
+
+The Mann-Whitney-Wilcoxon test (referred to as the Wilcoxon rank-sum test in R) compares two means by comparing the ranks of one sample vs. the ranks of the other. If there were differences in the median between two samples, you would expect that most of the small values would be in the sample with the lower median (or mean) and most of the large values would be in the sample with the higher median (or mean). R produces a test statistic called *W*. Just so you know in case you find this in papers, other sources call this test statistic *U* (elsewhere it's called the Mann-Whitney *U* test).
+
+Consider this example of CD4 cell counts in immunocompromised people. CD4 cells are a type of white blood cell; their levels in the blood are a measure of the competency of the immune system. We would expect that patients would have lower CD4 counts than control subjects.
+
+H~0~: The sample median of the controls ≤ than the median of the patients sample.\
+H~a~: The patient sample's median \> the patient sample.
+
+You'll notice that this dataset has unequal sample sizes between the two groups. That's not a problem; only the paired *t* test requires equal numbers in each group.
+
+```{r}
+cd4 <- read.csv(url("https://github.com/ericdewar/biostats/raw/refs/heads/master/cd4.csv"))
+head(cd4) # another way to preview data
+```
+
+Let's compare the medians to see what we'd expect.
+
+```{r}
+tapply(cd4$count, cd4$group, median)
+```
+
+Based on this, we expect that most of the smaller values should be in the patients group because it has the smaller median. Let's make another grouped histogram with the **`lattice`** package:
+
+```{r}
+library("lattice")
+
+histogram( ~ count | group, data = cd4, layout = c(1,2), col = "thistle", breaks = seq(0, 1400, by = 100), type = "count", xlab = "Count of CD4 cells", ylab = "Frequency")
+```
+
+As expected from the medians, we see that the patient group has more of the small values and the control group has more of the larger ones. Let's have R run the test now.
+
+```{r}
+wilcox.test(count ~ group, data = cd4, alternative = "greater")
+```
+
+Don't sweat that warning. It's just telling you that there are tied values (two of the controls had a count of 710. R can't calculate an exact P value if there are tied values. The R help tells us that "by default (if `exact` is not specified), an exact *P-*value is computed if the samples contain less than 50 values and there are no ties. Otherwise, a normal approximation is used"... and you get that error message.\
+
+##### Another example:
+
+Consider this example of two species of salmon. Kokanee salmon are freshwater fish but sockeye salmon spend most of their lives in the ocean before coming upriver to spawn. Both species turn red as the mating season approaches. Biologists raised both types of salmon in a low-carotenoid environment in a lab to see how their coloration would differ. Carotenoids are red/orange pigments (carrots have them too). The level of redness was measured by a device that gives them a score for pigment saturation.
+
+H~0~: Kokanee redness = sockeye redness\
+H~a~: Kokanee redness ≠ sockeye redness
+
+```{r}
+salmon <- read.csv(url("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter13/chap13q20SalmonColor.csv"))
+```
+
+Plot the data with the `lattice` package:
+
+```{r}
+library("lattice")
+
+histogram( ~ skinColor | species, data = salmon, layout = c(1,2), 
+           col = "salmon", breaks = seq(0, 2.5, by = 0.1), 
+           type = "count", xlab = "Skin color measure", ylab = "Frequency")
+```
+
+Now do some data hygiene to check against the assumptions that the data are normally distributed and have approximately equal variances (SDs).
+
+```{r}
+# the brackets and double equal sign tells R to scan the species column for the name of a particular species
+shapiro.test(salmon$skinColor[salmon$species=="kokanee"]) 
+shapiro.test(salmon$skinColor[salmon$species=="sockeye"])
+```
+
+```{r}
+## OR you can do this to test for normality
+
+tapply(salmon$skinColor, salmon$species, shapiro.test)
+```
+
+Now test for equality of variances:
+
+```{r}
+var.test(salmon$skinColor[salmon$species=="kokanee"], 
+         salmon$skinColor[salmon$species=="sockeye"])
+```
+
+Even though the two groups are normally distributed, they do not have approximately equal variances, as is seen in the stacked histogram.
+
+Can we transform these data and then use a regular *t* test?
+
+```{r}
+salmon$lncolor <- log(salmon$skinColor) # Make ln-transformed column
+
+tapply(salmon$skinColor, salmon$species, shapiro.test) # check normality
+
+var.test(salmon$lncolor[salmon$species=="kokanee"], 
+         salmon$lncolor[salmon$species=="sockeye"]) # check variances
+```
+
+No, the samples are still too different here, but we have two options. As before, we could compare the medians of each sample using the Mann-Whitney-Wilcoxon test.
+
+```{r}
+tapply(salmon$skinColor, salmon$species, FUN = median, rm.na = TRUE)
+# The argument rm.na = TRUE is there so that the blank values are ignored.
+```
+
+```{r}
+# run the test to see if the medians differ
+wilcox.test(skinColor ~ species, data = salmon)
+```
+
+We are able to reject the null hypothesis and conclude that the medians of the two populations are different from each other (*W* = 303, P \< 0.0001).
+
+Alternatively, because the data are normally distributed but just have different variances, we can use Welch's approximate *t* test, which is a fix that uses a method to make a "pooled variance." R actually runs the test this way by default for the two-sample test, and that's what can produce the fractional degrees of freedom that you might have noticed.
+
+```{r}
+t.test(salmon$skinColor ~ salmon$species, var.equal = TRUE) # the parametric test es no bueno
+t.test(salmon$skinColor ~ salmon$species) # Welch's approximation is the default
+```
+
+------------------------------------------------------------------------
+
+\
+Going forward we'll see that every parametric test has a nonparametric alternative for when the data fail to meet the assumptions of the parametric tests.

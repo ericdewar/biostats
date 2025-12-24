@@ -1,0 +1,34 @@
+---
+title: "Getting started with R"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+## Is it R or RStudio?
+
+R is a programming language. It can run in its own application or be wrapped in an IDE (Integrated Development Environment) like RStudio or Posit Cloud. An IDE makes a dashboard of many functions that make coding more convenient. There are other IDE applications out there for coding in R, but most scientists use RStudio because includes steamlined access for commands, scripts, plots, presentations, file access, and further accessory applications that extend the usefulness of the language.
+
+So, I usually talk about "coding in R" to mean writing in that language. RStudio is the interface that we use to write and save and share our writing.\
+
+## Console pane vs. Source pane
+
+One thing that makes statistical coding in R different than using statistical packages like SPSS or GraphPad Prism or a spreadsheet application like Excel is that R is a language that lets you create scripts so you can reuse work for similar problems later on. Most of our time in this class will be spent adapting model scripts or chunks of code for our purposes.
+
+SPSS and Excel and the rest have no memory. If you came back to a file weeks or years later it would be difficult to remember the steps you took to analyze your data. This is fine for simple things, I suppose, but not for larger datasets or repeating analyses on future data.
+
+Excel is a totally worthy data handler and fine for office-like functions, but R gives more robust statistical tools, superior visualizations, and better ways to share your work.
+
+In RStudio, you see two panes that can look similar but represent different things:
+
+-   The **Console** is where you can type commands in directly. Those functions are saved elsewhere in the **History** pane.
+
+    -   You can recall earlier functions using the arrow keys. This accesses the command history and lets you reuse/edit those commands
+
+-   The **Scripts** pane is a text editor where you can access scripts to send commands to the console instead of retyping.
+
+    -   Text documents that end with .R are "regular" R scripts. They are totally workable for saving code work and sharing with others.
+
+    -   Scripts that end with .qmd (like this one) are Quarto documents. They include R code but operate more like electronic notebooks, so you can include your reasoning, conclusions, or other information and export them into many formats, from websites to PDFs to books.
+
+        -   The tutorials for our class will be Quarto documents rather than pages in Canvas so that you can access the code more easily in RStudio.

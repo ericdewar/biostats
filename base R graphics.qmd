@@ -1,0 +1,302 @@
+---
+title: "Visualizations"
+author:
+  - name: "Eric W. Dewar"
+    email: edewar@suffolk.edu
+format: html
+date: 2025-07-10
+---
+
+# Graphics in base R
+
+Graphics like tables and figures are an important aspect of communicating information because when well-designed, they make it easier for us to us to communicate the "sense" of data far better than with sentences alone.
+
+There are rules for making successful graphics. Some of these are best practices that make good use of the abilities our eyes and brain has, but others are conventions depending on the kind of data that we are describing.
+
+R has a number of powerful tools for making publication-quality graphics. Many of them can be done with the `graphics` package that loads at startup in RStudio, but we can also use `ggplot2`, which is a `tidyverse` package that we have to activate when we want to use it.
+
+This tutorial will give examples of making tables and graphics in base R. A separate tutorial will explain the "grammar of graphics" used in `ggplot2`. This tutorial won't include every possible type of graph, but it will introduce a few useful ones and set you up to explore others as we work with different types of data soon.\
+
+------------------------------------------------------------------------
+
+## Plotting in base R vs. `ggplot2`
+
+There are two ways that people make plots in RStudio. Both will result in clean, publication-quality graphics, and there are times when one might be preferable, but we should always aim for clarity in data presentation above all.
+
+The base R functions are helpful, but the functions in the package `ggplot2` (part of the `tidyverse` set) have a lot more presets and themes that are available. Always, *always* choose the approach that will give you the plot that will be most helpful to the viewer. Lots of extraneous shading or other non-data points might look cool on a slide, but our goal is always conveying the message of your data.\
+
+------------------------------------------------------------------------
+
+## Categorical data
+
+### Making tables
+
+The first few examples will use my data set about the lengths (in cm) of the skulls of mammalian carnivores and the bite force that they can generate (in N). First we'll bring in the data as a **data frame**, which is a common data structure in R that we can think of as like a spreadsheet. In R, categorical variables need to be made into a data frame so that they can be counted.
+
+```{r}
+# bring in the data 
+sklbite <- read.csv("https://github.com/ericdewar/biostats/raw/refs/heads/master/SKL-bite.csv")
+```
+
+It's a good idea to use the functions in the next chunk to inspect the data. The following code chunk will open another tab in the script window over this Quarto tab when it's run in RStudio. You can just navigate back to here. I like to keep the `View` tab open when I'm working with a dataset because it's a pretty clean way to summarize the data and variable/column names.
+
+```{r}
+View(sklbite) # preferred?: opens the data as a tab in the script pane 
+
+head(sklbite) # optional: shows the first few rows of the dataset
+
+# or
+sklbite # this just reports the data frame in the console or Quarto
+
+```
+
+If we wanted to know how many species were represented within each family, we could count them manually, but R can do it for us in a few steps. Once you get how the workflow is set up, this is *a lot* easier and more reliable than doing it by hand for large data sets.
+
+Note that the following code chunk will result in three small output panels showing the results when we run them in RStudio. If you render this document they will appear one after the other.
+
+```{r}
+familyTable <- table(sklbite$family) # Makes a table object from the 'family' column of the data frame, listing the categories alphabetically
+
+familyTable <- sort(table(sklbite$family), decreasing = TRUE) # Sorts the table object by frequency
+
+familyTable # just reports back the sorted table in the console, listed in a row
+
+data.frame(Frequency = familyTable) # makes this a vertical table (more usable)
+
+data.frame(Frequency = addmargins(familyTable)) # makes a vertical table with the total if you want that
+```
+
+------------------------------------------------------------------------
+
+### Bar/column plots
+
+Bar plots are used to **describe frequency distributions of samples of categorical data**. A frequency distribution is the number of times each value of a sample occurs for Continuous data should be shown with histograms (more on them below). Bar plots should sort the categories from most frequent to less frequent. That will happen if you used the `sort` function above when you made the table.
+
+```{r}
+
+barplot(familyTable) #basic
+
+## base R with more options
+# ylab sets the label for the Y axis
+# las = 2 orients the labels horizontally 
+
+barplot(familyTable, ylab = "Frequency", las = 2, col = "firebrick")
+
+```
+
+The `las` argument (Label of Axis Style) used above for the base R plot lets us orient the tick mark labels for better readability. The options are:
+
+> `las = 1`: Parallel to axis (default)\
+> `las = 2`: Horizontal\
+> `las = 3`: Perpendicular to axis\
+> `las = 4`: Vertical
+
+Some of the labels can get cut off in the base R plot when viewed in the Quarto document. It won't always be a problem in the rendered document.
+
+Running that script in the console will make a plot appear in the Viewer tab. The margins can be set manually when needed and exported if you need (more later).
+
+[This website](https://r-graph-gallery.com/74-margin-and-oma-cheatsheet.html) elaborates a little on how to do it if you want to check it later on.\
+\
+
+------------------------------------------------------------------------
+
+## Numerical data
+
+### Histograms
+
+Histograms look like bar plots, but they are one way to show the **distribution of a numerical variable across its observed range** in a sample. The "bars" of the plot are right up against each other (unlike the bar plot), implying that the bins for each part of the range are continuous with one another.
+
+We'll demonstrate making histograms using the carnivore bite force data set again.
+
+```{r}
+
+# in case you need to reload the dataset into memory
+sklbite <- read.csv("https://github.com/ericdewar/biostats/raw/refs/heads/master/SKL-bite.csv")
+
+# make a plot of the lengths of carnivore skulls in the sample
+# the $ indicates that we are plotting the length column of the dataset
+
+hist(sklbite$length, right = FALSE) #basic
+
+# main = "" makes a blank legend
+hist(sklbite$length, right = FALSE,
+     xlab = "Skull Length (cm)", ylab = "Frequency",
+     col = "violet",
+     main = "")
+
+
+# change the bin sizes
+hist(sklbite$length, right = FALSE,
+     xlab = "Skull Length (cm)", ylab = "Frequency",
+     xlim = c(0, 40),
+     col = "green4",
+     breaks = seq(5, 35, by = 2), # range 5-35 cm, bin sizes 2 cm each
+     main = "")
+
+```
+
+::: callout-note
+The `right = FALSE` indicates that the bins are left-bounded. This means if you had the data binned in 2 cm groups, then the bins would go from 0 to 2 and the next were 2 to 4, an observation of 1 would be included in the first bin but 2 would be in the next bin. You can decide how you want to define the borders of your bins in a way that describes your data in clearly.
+:::
+
+::: callout-note
+I usually use the "dollar sign" way to indicate which column of a data frame I want to work with, like this: `hist(sklbite$length)` but an alternative is `hist(length, data = sklbite)`. I like the first way better because this way I can use the autofill functions in the console or script window to suggest column names rather than having to remember them.
+:::
+
+------------------------------------------------------------------------
+
+### Boxplots
+
+Boxplots (also called box-and-whisker plots) are also used to show the distribution of numerical variables, especially when comparing different groups.
+
+```{r}
+
+# load a built-in data set about the weights of chicks on different feed types
+data("chickwts") 
+
+# The argument in the parentheses is Y ~ X
+boxplot(chickwts$weight ~ chickwts$feed) #basic
+
+# or you can assign colors to groups manually
+boxplot(sklbite$bite ~ sklbite$family, 
+        las = 2,
+        col = c("red", "orange", "yellow", "green", "lightblue", "violet", 
+                "orangered", "dodgerblue", "brown"),
+        xlab = "", ylab = "Bite force (N)")
+
+```
+
+The family groups don't have a lot of variation, but if you look at the felid, hyaend, or ursid groups, you'll notice what a typical boxplot looks like:
+
+-   the box shows the interquartile range, or the middle 50% of the data.
+
+-   the line in the box is the median, the 50% line of the data (*not* the mean)
+
+-   the whiskers depict the top and bottom 25% of the distribution
+
+-   the circles are outliers, which are observations that are noticeably away from the rest of the data. You can see them with the canid and viverrid groups.
+
+------------------------------------------------------------------------
+
+### Scatterplots
+
+Scatterplots are used to show the relationship between two numerical variables.
+
+```{r}
+
+plot(sklbite$bite ~ sklbite$length) #basic 
+# The argument in the parentheses is Y ~ X
+
+plot(sklbite$bite ~ sklbite$length, 
+     las = 1, # axis label oriented to read
+     pch = 16, col = "firebrick", # solid red circle icon
+     cex = 1.5, # expand icon to 1.5x
+     bty = "l", # make the box around the data an "L" shape
+     xlab = "Skull length (cm)", ylab = "Bite force (N)")
+
+```
+
+The function `pch` means "plotting character" used for data points. There are a bunch of preset icons (0-25) that can be used.
+
+![R plotting symbols](images/pch.png)
+
+You can also assign letters if you choose. There is more information in RStudio with `help(pch)` or many graphics-help websites (like [here](https://r-charts.com/base-r/pch-symbols/) and [here](https://r-graph-gallery.com/)).\
+\
+
+------------------------------------------------------------------------
+
+### Stripcharts
+
+Stripcharts are like boxplots but represent each point in the group. This is another great plot type because it actually shows all the data. I recommend using a "hollow" plotting character (0-6 on the symbol-list figure above) so that you can see when they overlap.
+
+```{r}
+# bring in the built-in dataset chickwts again
+data("chickwts") 
+
+stripchart(weight ~ feed, data = chickwts, 
+           method = "jitter", 
+           las = 2, 
+           vertical = TRUE)
+
+stripchart(weight ~ feed, data = chickwts, 
+           xlab = "Type of feed", ylab = "Weight (g)", 
+           col = "firebrick", 
+           las = 2, 
+           method = "jitter", 
+           vertical = TRUE)
+```
+
+\
+
+------------------------------------------------------------------------
+
+### Line plots
+
+Line plots show the changes in a numerical variable over time.
+
+```{r}
+data("Nile") # load the datset about water flow in the Nile River through time
+
+Nile # view the object in the console
+
+plot(Nile, type="l") #basic
+
+plot(Nile, type="l", las = 1, col = "blue", ylab = "Water Flow of Nile River", xlab = "Year")
+
+```
+
+\
+
+------------------------------------------------------------------------
+
+## Levels of data and graphics
+
+### ***Some take-home messages:***
+
+-   When **describing frequency distributions of samples**, categorial data are described with bar charts but numerical data should be shown with histograms.
+
+    -   Numerical variables can be read straight from the "column" of a data frame (this is the way that CSV spreadsheets are usually treated in R).
+
+-   **Relationships between two numerical variables** are best shown by
+
+    -   a scatterplot for regular XY data comparisons (confirm that you [actually]{.underline} have two variables before using!)
+
+    -   a line graph if showing the trend of a variable over time
+
+-   **Relationships between two categorical variables** could be shown with:
+
+    -   a grouped bar chart
+
+    -   a mosaic plot (which has the advantage of expressing the difference in sample size *and* proportion).
+
+-   **Relationships between one numerical and one categorical variable** are described well by
+
+    -   strip charts
+
+    -   boxplots (also called box-and-whisker plots)
+
+    -   multiple (stacked) histograms
+
+    -   cumulative frequency distributions
+
+------------------------------------------------------------------------
+
+## Exporting plots to other applications
+
+Quarto documents look great, but sometimes you need to get your plots into a paper or poster. You can use the code from a quarto doc just by copy/pasting it to the console, which will make your plot appear in the **Plots** tab.
+
+From there, choose **Export \> Save as Image...** and a dialog box will open for you to adjust the size, choose the output format, specify where to save it, etc.
+
+::: callout-caution
+JPG is a good all-purpose "bitmap" format but it gets jagged if you increase its size for a poster because the image is saved as pixels.
+
+EPS is a "vector" graphical format, meaning that it's a bunch of graphic equations that are scalable when they are zoomed. I prefer this when I am using Adobe Illustrator or Photoshop.
+:::
+
+------------------------------------------------------------------------
+
+## Links to other resources
+
+[R graph gallery](https://r-graph-gallery.com/)
+
+[r-charts.com](https://r-charts.com/)

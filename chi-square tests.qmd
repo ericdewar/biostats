@@ -1,0 +1,139 @@
+---
+title: "Chi-square tests"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+## Chi-square tests
+
+**Chi-square tests** are used to compare relationships between variables measured at the nominal scale. These tests look for differences among frequencies or departures from expected frequencies.
+
+The test algorithm might be familiar for people who have taken genetics:
+
+$$
+\chi^2 = \sum {\frac{(observed-expected)^2}{expected}}
+$$
+
+This test has to include its degrees of freedom, which is related to the number of categories included:\
+DF = \# categories – 1 – the number of parameters estimated by the data (in most cases this will be 0).
+
+The assumptions of this test are:
+
+1.  Observations are taken at the nominal scale. Categories of the nominal scale are represented as mutually exclusive.
+
+2.  Observations are independent of one another.
+
+3.  No category has an expected frequency of less than 1, or if there are lots of categories, not more than 20% of the categories can have an expected frequency \< 5.\
+
+### Goodness-of-fit
+
+We can use chi-square to see if a set of observations fit our expectations.
+
+Let's say that we have a bunch of flowers, and we think that flower petal coloration is determined by a simple Mendelian gene. If this were true, then we would expect a color ratio of 3 yellow to 1 white. We observed 100 flowers and found 84 yellow and 16 white. Can we determine if these follow expected Mendelian ratios at a confidence level of $\alpha$ = 0.05?
+
+So, we need to determine what our expected frequencies are. Given 100 flowers with a 3:1 ratio, we would expect 75 yellow and 25 white.
+
+**H~0~**: Ratio of yellow to white is 3 : 1\
+**H~a~**: Ratio of yellow to white is not 3 : 1
+
+In R we use the `chisq.test` function:
+
+```{r}
+# make a vector of observed *values*
+obs <- c(84, 16)  
+
+# make a vector of expected *proportions*. 
+#   NOTE: A fractional format will always work, but R will choke if the proportions 
+#   don't add up to 1.0 exactly
+
+exp <- c(3/4, 1/4)
+
+# do the test
+chisq.test(x = obs, p = exp)
+```
+
+This **test statistic** (the value for chi-square) results in a P-value of 0.038, so we would reject the null hypothesis that the flowers have a 3 : 1 color ratio. Based on this, we conclude that the gene that controls flower color is not a Mendelian one.\
+
+### Goodness-of-association
+
+Another use of chi-square is to see if disproportionate relationships exist between a category variable and a grouping variable. Consider this example that companies severity of lesions with age. For these data,
+
+**H~0~**: There is an relationship between age and lesion severity.\
+**H~a~**: Lesion severity depends on age.\
+
+```{r}
+ 
+# bring in the data. Fill in with your file path.
+lesions <- read.csv(url("https://raw.githubusercontent.com/ericdewar/biostats/refs/heads/master/lesions.csv"))
+
+# make grouping variables
+lesions$age <- factor(lesions$age, 
+ levels = c("30-39", "40-49", "50-59", "60-69"))
+
+# make those data a table
+lesionsTable <- table(lesions$age, lesions$severity)
+
+# and add the marginal totals on the table
+addmargins(lesionsTable)
+
+
+# If you want a mosaic plot of these data
+mosaicplot( t(lesionsTable), col = c("red2", "yellow", "green3", "blue"), 
+ cex.axis = 1, main = "", las = 2,
+ sub = "Lesion severity", ylab = "Age")
+
+     
+# do the test of association
+chisq.test(lesions$age, lesions$severity, correct = FALSE)
+```
+
+In this case, the P-value of 0.62 is way higher than the usual confidence level of 0.05, so we fail to reject the null hypothesis.
+
+\
+
+------------------------------------------------------------------------
+
+## Fisher's exact test
+
+Sometimes we have contingency tables that have only two rows and two columns. We can use the usual goodness-of-association test or we can use Fisher's exact test, which compares outcomes to expected probabilities like chi-square but using a different probability called the odds ratio.
+
+```{r}
+vampire <- read.csv(
+  url("https://whitlockschluter3e.zoology.ubc.ca/Data/chapter09/chap09e5VampireBites.csv"),
+  stringsAsFactors = FALSE)
+```
+
+Make the 2 x 2 contingency table (Table 9.5-1).
+
+```{r}
+vampireTable <- table(vampire$bitten, vampire$estrous)
+vampireTable
+```
+
+## 𝜒2 contingency test
+
+Get the expected frequencies under null hypothesis of independence using `chisq.test()`. R complains because of the violation of assumptions, but this is just advisory.
+
+H0: There is no association between estrous status of cows and bites by vampire bats.\
+Ha: An association exists between estrous status of cows and bites by vampire bats.
+
+Use $\alpha$ = 0.05
+
+```{r}
+chisq.test(vampire$bitten, vampire$estrous, correct = FALSE) 
+
+
+```
+
+Compare this result with the Fisher test:
+
+```{r}
+fisher.test(vampire$bitten, vampire$estrous)
+```
+
+In this case, the results were similar, but with less clear data Fisher's test should be more powerful (i.e., better able to reject a correct null hypothesis).\
+
+### Conclusion
+
+There are other applications of the chi-square test, but these two will get you pretty far. Soon we'll get to working with data that are ratio-level in information.  

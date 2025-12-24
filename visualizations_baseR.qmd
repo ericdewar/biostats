@@ -1,0 +1,78 @@
+---
+title: "Visualizations"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+# Sending meaningful visual messages
+
+Graphics like tables and figures are an important aspect of communicating information because primates are highly visual animals. Well-designed graphics make it easier for us to us to communicate the "sense" of data far better than sentences or tables alone.
+
+There are rules for making successful graphics. Some of these are best practices that make good use of the abilities our eyes and brain has, but others are conventions depending on the kind of data that we are describing.
+
+------------------------------------------------------------------------
+
+## Some ground rules: Variables and types of data
+
+First of all, know that the word "data" is a plural word. The singular form is "datum," meaning one data point. Your data come in variables that come a few different varieties or levels:
+
++:----------------:+---------------------------------------------------------------------------------+------------------------------+
+| **Type of data** | **Level**                                                                       | **Example**                  |
++------------------+---------------------------------------------------------------------------------+------------------------------+
+| **Categorical**  | **Nominal**—names only                                                          | names of species             |
+|                  |                                                                                 |                              |
+|                  | **Ordinal**—there is a magnitude difference, but not a numerical one            | small/medium/large           |
++------------------+---------------------------------------------------------------------------------+------------------------------+
+| **Numerical**    | **Interval**—measured on a scale with equal units, but without a 0 on the scale | temperature                  |
+|                  |                                                                                 |                              |
+|                  | **Ratio**—measurable on a scale with a 0                                        | weight, counts, length, etc. |
++------------------+---------------------------------------------------------------------------------+------------------------------+
+
+Additionally, numerical data can either be **discrete** (whole numbers only) or **continuous** (can be any real number).
+
+The table above describes the levels of data *from low to high*—meaning that as you go down the rows, the data have more inherent information in them. It's always possible to "downshift" data from a higher level to a lower one. For example, you could weigh beetles using a scale (ratio level) but later call them "small or large" (ordinal level). You'd lose some information, but you'd be justified in your conclusions. Losing statistical resolution is a valid compromise to let us answer questions with messy data.
+
+However, you can't go the *other* way, so that you're "inventing" information. If I think of my students as "tall vs. short," I can't later proclaim that all "tall" students are 72 in. tall while all "short" students are 48 in. tall. That would invent information, and that is unjustified.
+
+So, best practice when you're collecting your own data is to always try to gather them at as high a level as possible.
+
+------------------------------------------------------------------------
+
+## Levels of data and graphics
+
+Why talk about this now? Because the graphics that you make send a message to your viewer about the kind of data that you observed. The video on the next page describes different kinds of graphics appropriate for various types of data.
+
+[This video](https://www.youtube.com/watch?v=6Zcl43ieB9w) also demonstrates making this script work. Please watch and work through the examples.
+
+#### ***Some take-home messages:***
+
+-   When **describing frequency distributions of samples**, categorial data are described with bar charts but numerical data should be shown with histograms.
+
+    -   In R, categorical variables need to be made into a data frame so that they can be counted.
+
+    -   Numerical variables can be read straight from the "column" of a data frame (this is the way that CSV spreadsheets are usually treated in R).
+
+-   **Relationships between two numerical variables** are best shown by
+
+    -   a scatterplot for regular XY data comparisons (confirm that you actually have two variables before using!)
+
+    -   a line graph if showing the trend of a variable over time
+
+    -   or a map (for trends with space or geographic area).
+
+-   **Relationships between two categorical variables** could be shown with:
+
+    -   a grouped bar chart
+
+    -   a mosaic plot (which has the advantage of expressing the difference in sample size *and* proportion).
+
+-   **Relationships between one numerical and one categorical variable** are described well by
+
+    -   strip charts
+
+    -   boxplots (also called box-and-whisker plots)
+
+    -   multiple (stacked) histograms
+
+    -   cumulative frequency distributions

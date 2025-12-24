@@ -1,0 +1,314 @@
+---
+title: "t tests"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+## 1. Estimating the normal distribution
+
+We know that when very large sample sizes are observed that they tend to be distributed normally (with a normal distribution). The predictability of the proportions of the normal distribution make the *Z*-test a powerful one. (Remember that a test with statistical "power" means that the algorithm has a good ability to discern differences or relationships between groups.) The problem with the *Z*-test is what it requires to work—we have to know the parametric standard deviation $\sigma$ for it to work. We rarely get "true" parametric knowledge of biological populations.
+
+All statistical tests have assumptions. When we start working with data that are not as strictly probabilistic as flipping coins or rolling dice, then we need to test to see if those assumptions about our data are correct. Luckily, formal tests have been developed to assess our data for normality and equality of sample variances.
+
+**The general workflow for a statistical test like *t* is:**
+
+1.  Formulate the question to be answered.
+2.  State null and alternative hypotheses with appropriate tailedness
+3.  Decide on a level of significance ($\alpha$ \< 0.05 or lower)
+4.  Test to see if the data are normally-distributed (also the check the variances for a two-sample test)
+5.  If fail to reject H~0~ in step 4, then run the *t* test
+6.  State conclusion, test statistic, degrees of freedom, and P-value
+
+------------------------------------------------------------------------
+
+## 2. The one-sample *t* test
+
+In 1908, William Sealy Gosset, a statistician working for the Guinness Brewing Company, discovered a test for analyzing small sample sizes that were approximately normally-distributed. The [lore](https://priceonomics.com/the-guinness-brewer-who-revolutionized-statistics/) of this is famous for statisticians. This test and distribution has come to be called **Student's *t*** or the ***t*** **test**. Its formula is
+
+$$t=\frac{\overline{Y}-\mu}{SE_{\overline{Y}}}$$
+
+Notice that it has the basic layout of *Z* because it compares an observation or sample mean to a parametric (or comparison) mean divided by the dispersion of the population—but here the parametric $\sigma$ is *estimated* by the sample's **standard error of the mean**. The standard error (or SE or SEM or $SE_{\overline{Y}}$) is the standard deviation of the estimate of the mean that accounts for the sample size, calculated like this:
+
+$$
+SE_{\overline{Y}} = \frac{s}{\sqrt{n}}
+$$
+
+In R, we could calculate the SE with `sd(x) / sqrt(length(x))`. However, in practice we rarely calculate the SE for its own sake—usually it's calculated by R in the background when needed for tests like *t* and other tests that we'll use later.
+
+The result is a normalish-looking distribution, but (1) the proportions are a little different in the tails (the area we're usually interested in) and (2) the shape of the distribution changes as the sample size increases. This means that we have to keep track of the degrees of freedom. For a one-sample *t* test, df = *n* - 1. At sufficiently large samples (say, *n* \> 30), the distribution of *t* approximates the shape of a normal distribution quite closely.
+
+This test has assumptions:
+
+-   Data are randomly sampled from a single population
+
+-   The variable is either interval or ratio-scale data. It can be continuous or may be discrete if it can attain a large range of values.
+
+-   The data are approximately normally distributed: that is, not skewed and without outliers. We'll test for that.
+
+    -   Check this with the **Shapiro-Wilk test** (`shapiro.test)`. It tests the null hypothesis that the data are normally-distributed: rejecting H~0~ means that the data are non-normal so we would have to use an alternative to the *t* test
+    -   We can compare the sample with expectations *visually* with a **quantile-quantile (Q-Q) plot** (`qqnorm`)
+
+### 2.1. Using the *t* test
+
+Here is an example: Imagine I observed a sample of intertidal crabs, and I want to know if their internal temperature at low tide is different than the temperature of the air at that time (24.3 °C). Let $\alpha$ = 0.05.
+
+H~0~: The crabs' temperature is the same as the air ($\overline{Y}$ = 23.3 °C).\
+H~a~: The crabs' temperature is different than the air ($\overline{Y}$ ≠ 23.3 °C).
+
+```{r}
+# make a vector of the data
+crabs <- c(25.8, 24.6, 26.1, 22.9, 25.1, 27.3, 24.0, 24.5, 23.9, 26.2, 24.3, 24.6, 23.3, 25.5, 28.1, 24.8, 23.5, 26.3, 25.4, 25.5, 23.9, 27.0, 24.8, 22.9, 25.4)
+```
+
+Now, one of the assumptions of the *t* test is that the data are "approximately normally distributed." We chec for that using another statistical test called the Shapiro-Wilk test. It tests the H~0~ that the data are normally distributed. Failing to reject H~0~ means that they are normal and you can use the "straight" *t* test. We can also visualize the distribution of our sample vs. a hypothetical normal distribution using a quantile-quantile plot (Q-Q plot).
+
+```{r}
+# Test for normality of data. A *non-significant* result means that they are normally distributed. 
+shapiro.test(crabs)
+```
+
+```{r}
+# A Q-Q plot that is non-normal will have noticeable gaps or breaks in the distribution
+qqnorm(crabs)
+```
+
+The result of the Shapiro-Wilk test tells us that the data are normal enough to satisfy the assumptions of the *t* test. The Q-Q plot shows that the data lie pretty close to the straight diagonal line that would be predicted for a truly normal sample. We'll talk later about what to do if your data fail to meet this assumption.
+
+It's not perfect, but close enough to let us use the straight *t* test. So let 'er rip!
+
+```{r}
+# Do the test and specify that the population mean is 24.3 
+
+shapiro.test(crabs) # tests the H0 that sample is normally-distributed
+
+t.test(crabs, mu = 24.3)
+```
+
+So, we calculated a value of *t* = 2.7128 at 24 degrees of freedom. The two-tailed critical value at df = 24 [(from a *t* table)](https://en.wikipedia.org/wiki/Student%27s_t-distribution#Table_of_selected_values) is 2.06. Because our calculated value for *t* exceeds this critical value, we can reject the null hypothesis. The output shows that P = 0.01215.
+
+Notice that the output also includes the 95% CI for the population mean by default, and that 24.3 is not in that range. If you wanted a different CI width, you can specify it with the `conf.level =` argument, like this:
+
+```{r}
+# Do the test and specify that the population mean is 24.3 but use a 99% confidence level
+t.test(crabs, mu = 24.3, conf.level = 0.99)
+```
+
+So our $\overline{Y}$ = 25.028 °C. What if we wanted to ask if the crabs were *hotter* than the air temperature, not just different than 24.3 °C? Then we'd do this:
+
+H~0~: The crabs' temperature is lower than or the same the air ($\overline{Y} \le$ 23.3 °C).\
+H~a~: The crabs' temperature is warmer than the air ($\overline{Y}$ \> 23.3 °C).
+
+```{r}
+# Use the crab vector from before
+
+# Do the test and specify that the population mean is 24.3
+
+# Also specify the tailedness with the argument alternative = "greater" or "less". You can specify just the initial letter.
+
+t.test(crabs, mu = 24.3, alternative = "g")
+```
+
+Why is it so much more significant? Because we've put our whole area of rejection into the right tail instead of splitting that 5% up between the two. The critical value from the table is way lower, too: $t_{\alpha\left(1\right),\:24}$ = 1.71.
+
+::: callout-important
+By the way, note the confidence interval from the one-tailed output. The 95% CI [**isn't "infinite"**]{.underline} on the upper bound. That's a quirk of how R displays the output of a one-tailed test. This shows where the extreme bound is in the direction of your hypothesis test. In this case, 24.57 is the *minimum* value for the confidence band. If you do want the 95% CI, then just run a two-tailed test. The two-tailed CI of $\mu$ is the same regardless of whether you are testing a one-tailed or two-tailed hypothesis.
+:::
+
+### 2.2. *t* tests with summary statistics rather than raw data
+
+If you only have summary statistics like a mean and a standard deviation, this can be used too. This is handy if you are working backwards from summarized data from a paper rather than from raw data. You'll need to download the package `BSDA` using `install.packages("BSDA")`. This tests the same null hypothesis, that the difference between the sample mean and the population mean is 0.
+
+For this example, if you had a sample mean of 0.01, a sample standard deviation of 0.1, and sample size of 5, then you could use this:
+
+```{r}
+library(BSDA)  #install the package; only needed once
+
+# t test for sample mean of 0.01, a sample standard deviation of 0.1, and sample size of 5
+tsum.test(mean.x=.1, s.x=.01, n.x=5)
+
+# the warning just states that there is a default arugument (of equal variances) that is being ignored for a one-sample test.
+```
+
+------------------------------------------------------------------------
+
+## 3. Comparing two means
+
+There are times when we want to compare a sample mean to a parametric value. Perhaps more commonly, we want to compare the means of two samples to see if they represent different populations. There are two such tests: **paired-sample tests and independent-sample tests**.
+
+## 3.1 Before and After: Tests for paired or related samples
+
+"Paired" tests are used in situations when we want to compare the change (error variance) of each individual in a group before and after a treatment. Consider if we wanted to test the effects of a drug for lowering cholesterol. A group of people would have their levels measured before treatment and then again afterward. These two observations (usually just framed as "before" and "after") are *not independent of one another* because they're done on the same person. If we ignored that, then we would see a lot of trends that were only due to the similarities of the subjects themselves (a problem called autocorrelation).
+
+So, first we pair up the data and then calculate the average difference ($\overline{d}$) between the two sampling points. The formula itself is very similar to the one-sample *t* test:
+
+$$
+t\:=\:\frac{\overline{d}-\mu_{d_0}}{SE_{\overline{d}}}\text{, where }SE_{\overline{d}}\:=\frac{\:s_d}{n}
+$$
+
+However, here we are comparing the observed before/after differences to the differences we would expect if there were no effect due to the treatment ($\mu_{d_0}$ = 0). We can also set a standard of some value if "success" means more than a particular difference (that is, $\mu_{d_0}$ could be set to 10 or 50).
+
+The paired *t* test has *n* – 1 degrees of freedom, where *n* is the number of *pairs* of observations (or the number of differences).
+
+The paired *t* test is testing the hypothesis of no difference between the two sampling points, but in practice we usually use the one-tailed construction—we usually want to know if a treatment improved or increased/decreased an attribute—not just made it *different* than before. I like to calculate the differences as "after – before" comparisons so that the signs make intuitive sense to the question:
+
+H~0~: There is no treatment effect or it decreased the desired outcome (A $\le$ B or $\overline{d}$ ≤ 0).\
+H~a~: The treatment increased the desired outcome (A \> B or $\overline{d}$ \> 0). (or vice versa if a decreased value is desirable)
+
+This test has [assumptions]{.underline}, and they are mostly like the one-sample *t* test:
+
+-   The data are randomly sampled from a population of interest.
+-   The variable is at the ratio or interval scale.
+-   The [difference]{.underline} between the observations of the variable are normally-distributed.
+-   Each individual is observed twice, before and after the treatment; if not, we compare matched pairs of individuals. Either way, $n_1$ = $n_2$. This is necessary, say, if the first observation requires that the subject had to be sacrificed after the observation. For example, maybe we needed to weigh the dry weight of the pancreas of rats, requiring surgical removal. The "after" observation would be made on an individual that was as similar as possible (sex, weight, age, etc.) as the individual from the "before" observation.
+
+### 3.2. Using the paired *t* test
+
+Imagine that I am testing the effects of a Very Low Calorie Diet (VLCD) on a sample of young women. My data are their weights (masses) in kg:
+
+**Before**: 117.3 111.4 98.6 104.3 105.4 100.4 81.7 89.5 78.2\
+**After**: 83.3 85.9 75.8 82.9 82.3 77.7 62.7 69.0 63.9
+
+Did the VLCD cause these subjects to lose weight ($\alpha$ = 0.05)?
+
+H~0~: The VLCD caused these subjects to gain weight or stay the same (A ≥ B or $\overline{d}$ ≥ 0).\
+H~a~: The treatment caused weight loss, the desired outcome (A \< B or $\overline{d}$ \< 0).
+
+In this example, there are nine pairs of observations, so there are 9 – 1 = 8 degrees of freedom. The critical value for rejection is $t_{0.05\left(1\right),8}$=-1.86. Why negative? Because we set up our differences as A – B differences. This means that if our calculated value for *t* from the data is more extreme than –1.86 we can reject the null hypothesis with P \< 0.05.
+
+```{r}
+# Make vectors of the observations 
+before <- c(117.3, 111.4, 98.6, 104.3, 105.4, 100.4, 81.7, 89.5, 78.2) 
+after <- c(83.3, 85.9, 75.8, 82.9, 82.3, 77.7, 62.7, 69.0, 63.9)
+
+# Combine those arrays into a data frame
+vlcd <- data.frame(before, after)
+
+# Calculate the differences between each pair and insert a new column
+vlcd$difference <-(vlcd$after - vlcd$before) ## This makes lost weight negative numbers
+
+# Inspect the differences to see if they appear to be normally-distributed
+hist(vlcd$difference, right = FALSE, col = "skyblue", main ="", xlab = "After - Before Difference")
+```
+
+Uh, yeah, I think that looks pretty darn normal, but we have to test for it anyway:
+
+```{r}
+# Test for normality of data. A non-significant result means that they are normally-distributed. 
+shapiro.test(vlcd$difference)
+
+# Normality can be visualized with a Q-Q plot
+qqnorm(vlcd$difference)
+```
+
+We can also visualize the differences due to the treatment in a "bump chart" like this.
+
+```{r}
+# Reshape your data into a new matrix 
+vlcd2 = reshape(vlcd, varying = 1:2, direction = "long", 
+                idvar = "vlcd", v.names = "weight", 
+                times = factor(c("before","after"), levels = c("before","after")))
+
+# Make a strip chart from that new matrix
+stripchart(weight ~ time, data = vlcd2, 
+           vertical = TRUE, 
+           col = "firebrick",
+           ylab="Body mass (kg)", las = 1, 
+           pch = 16)
+
+# Add the lines to track subjects
+segments(1, vlcd$before, 2, vlcd$after)
+```
+
+Okay, so let's do the test already. Either one of these will give you the same result:
+
+```{r}
+t.test(vlcd$after, vlcd$before, paired = TRUE, alternative = "l") ## if you didn't calculate the differences first
+```
+
+or
+
+```{r}
+t.test(vlcd$difference, alternative = "l") ## if you did calculate the differences first
+```
+
+Note that if we didn't include the argument `alternative = "less"` then we'd get the two-tailed result.
+
+So, we have a calculated *t* of -12.74 which throws us farther into the area of rejection than our $t_{0.05\left(1\right),8}=-1.86$. We can conclude that the VLCD treatment cause these subjects to lose weight (P \< 0.001).
+
+------------------------------------------------------------------------
+
+## 4. Two-sample *t* test (for independent samples)
+
+The two-sample *t* test assesses the null hypothesis that two samples come from the same population. Particularly, we want to know if the two populations have the same mean. The hypotheses tested are:
+
+${H_0}$: $\mu_1=\mu_2$ (or $\overline{Y}_1=\overline{Y_2}$)\
+${H_a}$: $\mu_1\ne\mu_2$ (or $\overline{Y}_1\ne\overline{Y_2}$)
+
+The formula for the test is $$t = \frac{(\overline{Y}_1 - \overline{Y}_2)-(\mu_1 - \mu_2) }{SE_{Y_1}-SE_{Y_2}}= \frac{(\overline{Y}_1 - \overline{Y}_2)-(0) }{SE_{Y_1}-SE_{Y_2}}$$
+
+We assume that the term $\mu_1-\mu_2$ is zero because we are testing the null hypothesis that the means of the two populations are equal. In the rare case that you wanted to test whether the two samples had a difference of 8 or something, then you'd have a 8 instead of 0 in that part of the equation. The denominator is a value called the "pooled variance," which is a drag to calculate by hand but R will knock it out like that's it's job. Which it is.
+
+This test's assumptions are:
+
+-   Random sampling from two populations of interest
+-   The measured variable is approximately normally-distributed and continuous and at the interval or ratio scale.
+-   If the variable is discrete, it must be assume a large range of values.
+-   The variance (and SD) of the numerical variable is the same for both populations. (We will test for this.)
+-   The degrees of freedom are calculated as df = $n_1 + n_2$ – 2.
+
+### 4.1. Using the two-sample *t* test
+
+The development of a vaccine against HIV has proven a multi-decade challenge for medicine. One effect of HIV disease is the destruction of the CD4 T cells that make antibodies. Vaccine researchers studied a strain of "humanized" mice that carried human CD4 cells (which are susceptible to infection by HIV). Treatment mice received human antibody-producing genes via a harmless retrovirus. Control mice were injected with a reporter gene instead. Did the treatment help to preserve CD4 cells?
+
+H~0~: Treatment mice had fewer or the same number of CD4 cells ($\mu_1\le\mu_2$).\
+H~a~: Treatment mice had more living CD4 cells ($\mu_1\gt\mu_2$).
+
+```{r}
+# Bring in the data from this website 
+mice <- read.csv(url("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter12/chap12q17HIVAntibody.csv"))
+```
+
+I like to use the package called `lattice` to do a stacked histogram. Click it to activate it in the "Packages" pane or use this function. The syntax is a little different than base R, though.
+
+```{r}
+library(lattice) # once to install
+
+histogram( ~ percentHealthyCD4 | treatment, data = mice, 
+           layout = c(1,2), 
+           col = "orange", 
+           xlab = "Percent healthy CD4 cells", 
+           breaks = seq(0, 100, by = 5))
+```
+
+Inspect those histograms. Do they look like they have the same spread of observations (variance)? Let's use a test to see if they are. There are several choices to pick from in R. We'll use the **variance ratio** **test** (called the *F* test) to test the null hypothesis that the ratio of the variances is = 1.
+
+```{r}
+# Variance ratio test 
+var.test(mice$percentHealthyCD4 ~ mice$treatment)
+```
+
+So, here we conclude that the variances are not different from one another (or that the ratio between them is not different from 1), P = 0.21. Notice that the 95% CI includes 1.
+
+Because we failed to reject the null hypothesis that the variances are different, we can add the function `var.equal = TRUE` so that R would calculate the degrees of freedom using the "usual" pooled variance. If we had found that the variances were not equal, we could add `var.equal = FALSE` so that R would calculate the degrees of freedom using a statistical fix called **Welch's approximate *t***.
+
+Welch's approximation will usually give a fractional degrees of freedom (like 12.7). *Always round down* to the next whole number. This way we don't artificially make it easier to reject H~0~.
+
+The two-sample *t* test runs Welch's approximation by default in R. Frankly, it's always safer to use Welch's approximation. In this example there was no difference between the two methods.
+
+So, now we can run the *t* test to compare the means of the two populations.
+
+```{r}
+# Do the test
+t.test(percentHealthyCD4 ~ treatment, data = mice, var.equal = TRUE)
+```
+
+So, it's clear that we can reject the null hypothesis that these means come from the same statistical population, (*t* = 8.04, df = 12, P \< 0.001).
+
+------------------------------------------------------------------------
+
+## 5. Conclusion
+
+The *t* test is a highly useful test for many biological variables when we are looking to compare an individual observation or a sample mean with a reference population or population expectation. We also saw the importance of doing some diagnostics on our samples to ensure that our data are normally-distributed (Shapiro-Wilk test and Q-Q plots) and have equal variances (*F* test).
+
+What happens when our data fail to meet the assumptions of the test that we want to use? How do we compare more than two samples? That comes soon.

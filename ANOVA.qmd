@@ -1,0 +1,276 @@
+---
+title: "ANOVA"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+# Comparing more than two means: ANOVA
+
+We can't just use *t* tests when we want to compare the means of more than two samples. If we tried that, we would find that a regular *t* test ignores the differences in standard errors between combinations of samples and it artificially raises the true probability of a Type I error:
+
+|  |  |  |
+|:--:|:--:|:--:|
+| **number of samples** | **number of pairwise tests needed** | **true** α, if we **start at 0.05** |
+| 2 | 1 | 0.05 |
+| 3 | 3 | 0.14 |
+| 4 | 6 | 0.26 |
+| 5 | 10 | 0.40 |
+| 6 | 15 | 0.54 |
+| 10 | 45 | 0.90 |
+
+So, if we have 10 samples, we'd have to do 45 two-sample *t* tests to compare all combinations, and the true probability of rejecting H~0~ would actually be much, much lower than our desired level of confidence. I would call that cheating the *t* test, so we need an alternative if we want to compare more than 2 means at the same time.\
+
+## ANOVA
+
+The ANalysis Of VAriance can compare more than two variables (really the means of several samples) in one step. The first design we'll learn is called **one-way or single-factor ANOVA**. This is used when we are want to compare samples that should only vary in one way: their mean. Later we should be able to tackle more complicated designs that have blocking or other factors.
+
+Despite the name, ANOVA tests for differences in *means* while taking their SDs into account. It tests these hypotheses:
+
+H~0~: μ~1~=μ~2~=...μ~k~ (with *k* being the number of the last sample)\
+H~a~: At least one of these means if different from another
+
+ANOVA's algorithm breaks up the variation of the samples into three sources:
+
+-   the **total** variation: the dispersion from the grand mean (of all the observations in all groups)
+
+-   the **groups (among)** variation: the difference between each sample mean and the grand mean of all data points included
+
+-   the **error (within)** variation: the spread within each sample comparing each observation with its sample mean
+
+![](https://www.dropbox.com/scl/fi/we04jgtp6y7m0d19l8yo0/anova-errors.jpg?rlkey=hff075e28kx80tw682toz63iy&dl=1){fig-align="center"}
+
+From these, we get the mean square errors that are compared for the *F* test.
+
+-   **error mean square (MS~e~)**: pooled sample variance within groups
+
+-   **group mean square (MS~g~)**: differences among the means of the different groups
+
+\
+If the null hypothesis were true, then MS~groups~ should be about equal to the MS~error~, but if the error between the groups is significantly greater than the error within the groups (based on the *F* table), then there are real differences between at least one mean and at least one of the others.
+
+The variance ratio (*F*) is *F*=MSgroups/MSerror. For degrees of freedom, MS~groups~ has DF *k –* 1 and MS~error~ has DF *N* – *k*, where *k* is the number of groups and *N* is the total of all observations. It's traditional to summarize all the calculated values in an ANOVA table, which has these parts:
+
+|  |  |  |  |  |  |
+|----|----|----|----|----|----|
+| **Source of variation** | **Sum of squares** | **DF** | **Mean squares** | ***F*** | ***P*** |
+| **Groups (treatment)** | SS~groups~ | *k* – 1 | SS~g~/DF | MS~e~/MS~g~ |  |
+| **Error** | SS~error~ | *N – k* | SS~e~/DF |  |  |
+| **Total** | =SS~e~ + SS~g~ |  |  |  |  |
+
+If we do reject H~0~, then we know that at least one mean is significantly different from the rest, but no which one. If we reject H~0~, next we do multiple comparisons to find out where the differences lie.
+
+### Example of doing ANOVA in R
+
+Consider this example 30 mice fed different diets (Control, Junk food, and Health food) to compare differences in their weights. Our hypotheses would be:
+
+H~0~: Weight gain is the same in all groups (μ~control~ = μ~junk~ = μ~health~)\
+H~a~: At least one of these means if different from another
+
+We'll use $\alpha$ = 0.05 as usual.
+
+```{r}
+# Bring in the data 
+diets <- read.csv(url("https://github.com/ericdewar/biostats/raw/refs/heads/master/diets.csv"))
+
+
+# Let's generate a summary table with some calculations first
+
+meanDiets <- tapply(diets$mass, diets$group, mean)
+sdevDiets <- tapply(diets$mass, diets$group, sd)
+n <- tapply(diets$mass, diets$group, length)  # length is the sample size
+data.frame(mean = meanDiets, std.dev = sdevDiets, n = n)
+
+
+
+```
+
+Inspecting the data, we see that the control group gained a moderate amount of weight, the health food group gained less weight than the control, and the junk food group gained the most weight. The standard deviations aren't too different from one another, but that's hard to visualize from a table alone. Each of the samples has the same sample size, which is what we call having a "balanced" sample. It's not required our groups be balanced, but when we do, the ANOVA has more statistical power.
+
+Let's visualize our observations with a stripchart:
+
+```{r}
+
+stripchart(mass ~ group, data = diets, 
+           method = "jitter", vertical = TRUE, 
+           xlab = "Diet type", 
+           col = c("red", "darkgreen", "black"))
+```
+
+```{r}
+
+## Optional: You can add standard error bars to the strip chart if you like. It takes some extra steps but uses the objects created above
+
+stripchart(mass ~ group, data = diets, 
+           method = "jitter", vertical = TRUE, 
+           xlab = "Diet type", 
+           col = c("red", "darkgreen", "black"))
+
+seDiets <- sdevDiets / sqrt(n)  ## calculate standard error
+adjustAmount <- 0.15  ## This moves the bars over from the point cloud
+segments( c(1,2,3) + adjustAmount, meanDiets - seDiets, 
+      + c(1,2,3) + adjustAmount, meanDiets + seDiets)  ## makes upper and lower bonds for the lines
+```
+
+```{r}
+# Now calculate the linear model (more on linear models generally later) and then do the ANOVA
+
+# calculate the linear model
+dietsANOVA <- lm(diets$mass ~ diets$group) 
+
+# do the NOVA on the linear model object
+anova(dietsANOVA)
+```
+
+That value for *F* is pretty huge (usually you'll find that *F* \> 4 or so will be significant), and we see that *P* \< 0.001. This allows us to reject H~0~, meaning that at least one of these means is different than another. Which one is/ones are different? To determine that, we need to do a pairwise test that accounts for the differences in the groups' standard errors. For that we will use the Tukey HSD test (below).
+
+::: callout-note
+A linear model is set up with the general form of Y \~ X (or outcome measure \~ grouping variable)
+
+As a reminder, these functions are equivalent:
+
+> `dietsANOVA <- lm(diets$mass ~ diets$group)`
+>
+> `dietsANOVA <- lm(mass ~ group, data = mice)`
+:::
+
+If you wanted to know what fraction of the variation is described by the treatment groups, use this:
+
+```{r}
+dietsANOVAsummary <- summary(dietsANOVA)
+
+dietsANOVAsummary$r.squared
+```
+
+So, about 69% of the variation in the total sample is described by the grouping. We'll work with the full linear model summary later when we work with linear regression.
+
+### Pairwise tests using Tukey's HSD
+
+If we fail to reject the null hypothesis, our job is over—we don't have anything else to do.
+
+If we do reject H~0~, all that tells us is that at least one of those sample means is different than one other sample mean. That's great, but it doesn't really give us the information that we want. Now that we've calculated the MS~e~, we can look for where those differences are without artificially raising our true α.
+
+John Tukey was a well-regarded American statistician. His **Honestly Significant Difference test** earnestly gives you the pairwise comparisons between samples. If you failed to reject H~0~ in the ANOVA, all of the HSD results would be insignificant too. If you did reject H~0~ in the ANOVA, at least one of the sample means will be shown to be different from another one.
+
+There are a few ways to do this, but I'll demonstrate using base R. Doing it this way requires you do an `aov` function first.
+
+```{r}
+# do the ANOVA using aov
+dietAOV <- aov(mass ~ as.factor(group), data = diets)
+
+dietAOV  # see the output
+```
+
+Now we can do the HSD:
+
+```{r}
+# do the pairwise comparison test
+TukeyHSD(dietAOV, ordered = FALSE, conf.level = 0.95)
+```
+
+This output reports:
+
+-   `diff`: the difference in the means between the two groups compared
+
+-   `lwr` and `upr`: the lower and upper bounds of the confidence interval
+
+-   `p adj`: the "adjusted" p values for the comparison
+
+In this case, we find that all three samples are significantly different from each other, but that won't always be true. Only one has to be different for you to have rejected the null hypothesis in the first step.
+
+\
+
+------------------------------------------------------------------------
+
+## The Kruskal-Wallace test: Nonparametric ANOVA
+
+Like all statistical tests, ANOVA has some assumptions:
+
+-   random sampling
+
+-   variable normally-distributed in all *k* populations that the samples come from
+
+-   equal variances in all *k* populations
+
+If our samples fail these assumptions, we can use a rank-order test for this (like the Mann-Whitney-Wilcoxon test was). You will calculate a $\chi^2$ value, using *k* – 1 degrees of freedom. This is a robust test when you have large sample sizes, and it can handle unequal variances if *n* is the same in each sample.
+
+For those same mouse diet data, it looks like this:
+
+```{r}
+kruskal.test(data$mass ~ data$group)
+```
+
+It's still a very significant result. Now we can do a pairwise test to see where the differences are.
+
+### Pairwise tests using Dunn's test
+
+Following a Kruskal-Wallace test, we would use Dunn's test to look for pairwise differences. Using that same dataset, we do this:
+
+```{r}
+install.packages("FSA") # install once
+library(FSA) # to to activate its functions
+
+dunnTest(diets$mass ~ diets$group, method="bh") # do pairwise comparisons
+```
+
+Again, all three groups are different from one another.\
+\
+
+------------------------------------------------------------------------
+
+## Planned comparisons
+
+Tukey's HSD is technicalled an example of an "unplanned" comparison—we use it only if a "global" ANOVA finds at least one significant difference among the means. We could also choose to make planned comparisons, when we want to make only a specific comparison between a couple of groups.
+
+I think that we'll get the most use out of the unplanned comparisons above, but this is included here for completeness.
+
+For example, load the `InsectSprays` dataset:
+
+```{r}
+data("InsectSprays")
+
+summary(InsectSprays) ## This displays whether the dataset is balanced.
+```
+
+What if we only wanted to compare groups A and D? We could do that in base R, but the `multcomp` package is a little more intuitive once you already have a fitted linear model from a global ANOVA:
+
+```{r}
+# Install the package called multcomp once with install.packages("multcomp") You only need that the first time, and only if you didn't click the yellow "install" bar at the top of the script
+
+library(multcomp) # activate the package
+
+## First do the global ANOVA using the linear model
+sprayANOVA <- lm(count ~ spray, data = InsectSprays)
+
+# Inspect the table, if you like
+anova(sprayANOVA)
+```
+
+```{r}
+## The planned comparison of just sprays A and D is done by making a new object:
+
+sprayPlanned <- glht(sprayANOVA, linfct = mcp(spray = c("A - D = 0")))
+
+## glht is a function for general linear hypotheses
+## linfct says which linear hypotheses are to be tested.
+
+#### In this case, we're testing the null hypothesis that sprays A and D are the same (that is, = 0)
+
+## Once that is done, the 95% CI and summary table are easy:
+
+confint(sprayPlanned)
+```
+
+The `Estimate` is the estimated difference between the two means and `lwr` and `upr` again refer to the bounds of the CI.\
+
+```{r}
+## For a different CI, specify the level (0.95 is the default)
+confint(sprayPlanned, level = 0.99)
+```
+
+```{r}
+## Here is the full results table if you wanted that
+summary(sprayPlanned)
+```
+
+That's all for now!

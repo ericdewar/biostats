@@ -1,0 +1,115 @@
+---
+title: "hypotheses - binomial"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+# Hypothesis testing and the binomial distribution
+
+## Working with observed binomial data in R
+
+The hand calculation for this is a bit of a chore, but the good news is that there is an easy way to calculate the probability of a single event.
+
+A prevous biostats class had 34 people with brown eyes out of 39 students, so Pr\[brown\] = 0.872. If I chose students at random from that group in groups of 5. Calculate the probability of randomly selecting 3 brown-eyed people out of those 5 when the probability of a hit (that is, selecting a person with brown eyes) is 87.2%.
+
+```{r}
+dbinom(3, size = 5, prob = 0.872)
+```
+
+What is the probability of getting 3 or more hits in groups of 5?
+
+This is Pr\[3 or more\] = Pr\[3\] + Pr\[4\] + Pr\[5\]
+
+```{r}
+dbinom(4, size = 5, prob = 0.872) 
+dbinom(5, size = 5, prob = 0.872) 
+
+# then sum all these probabilities
+```
+
+Or you could use this:
+
+```{r}
+# calculate the number of hits from 3 to 5
+xsuccesses <- 3:5
+
+# do each calculation
+probx <- dbinom(xsuccesses, size = 5, prob = 0.872)
+
+# make a table from those two values
+probTable <- data.frame(xsuccesses, probx)
+
+# display the table
+probTable
+```
+
+Another way to make the histogram: a barplot with 0 space between the bars
+
+```{r}
+barplot(height = probx, names.arg = xsuccesses, space = 0, las = 1, col = "brown", ylab = "Probability", xlab = "Brown-eyed people in biostats")
+```
+
+### Hypothesis testing with the binomial distribution (general format)
+
+```{r}
+# calculate the number of hits from 0 to 10
+xsuccesses <- 0:10
+
+# do each calculation, assume that Pr[X] = 0.28
+probx <- dbinom(xsuccesses, size = 50, prob = 0.28)
+
+# make a table from those two values
+probTable <- data.frame(xsuccesses, probx)
+
+# display the table
+probTable
+
+# Use this function to sum up those probabilities
+sum(probx)
+
+# OR to do the one-tailed test in one step without making the table, use this:
+binom.test(10, n = 50, p = 0.28, alternative = "less")
+```
+
+### Example from a spreadsheet
+
+```{r}
+# bring in the survey data
+drinks <- read.csv(url("https://github.com/ericdewar/biostats/raw/refs/heads/master/drinks.csv"))
+
+# count the number of coffee drinkers
+nullTable <- table(drinks, dnn = "coffee")/length(drinks)
+
+# make this value in the data frame format (like a spreadsheet)
+data.frame(nullTable)
+
+# calculate the probability of coffee drinkers
+prCoffee <- (sum(drinks$response == "coffee"))/(length(drinks$response))
+
+# calculate the single probability of getting 2 coffee drinkers out of 4
+dbinom(2, size = 4, prob = prCoffee)
+
+# Test to see if having 8 coffee drinkers out of 10 is significantly different than what would be expected
+binom.test(8, n = 10, p = prCoffee, alternative = "greater")
+```
+
+## Sampling distribution (CI) of the proportion
+
+There is an add-on package called "binom" that will bring in more functions than what is in base R. If you didn't add it from the yellow menu flag when you opened this document for the first time, the following line only needs to be run once:
+
+```{r}
+install.packages("binom", dependencies = TRUE) ## Run this just once to install
+```
+
+Load the `binom` package each session that you want to use it:
+
+```{r}
+library(binom)
+
+# calculate the 95% CI
+binom.confint(29, 50, method = "ac")
+
+# or see all the 95% CIs:
+binom.confint(10, 50)
+```

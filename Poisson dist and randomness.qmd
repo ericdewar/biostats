@@ -1,0 +1,136 @@
+---
+title: "Poisson dist and randomness"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+# **Testing for randomness with the Poisson distribution**
+
+## **Humans are bad at assessing randomness in samples.**
+
+**Consider these three plots:**
+
+![](https://www.dropbox.com/scl/fi/axvuzgf6041sxvaa2yh74/random.jpg?rlkey=085uiv4d2my0vrh1elg7tukm2&dl=1)
+
+I think that most people can distinguish the "clumpiness" of the right plot, but many of us would would have difficulty choosing whether the other two were truly random or just dispersed. Luckily, statistics comes to our rescue. We can use a new-to-us distribution called the **Poisson distribution** (named for [Siméon Denis Poisson](https://en.wikipedia.org/wiki/Sim%C3%A9on_Denis_Poisson), not 🐟) to determine our expected probabilities. We can then use the chi-square goodness-of-fit test to compare what we have with what we would expect if the data were randomly distributed.
+
+**That's what this is about: whenever we are testing the null hypothesis of randomness (independence of probability) we will use this method.**
+
+------------------------------------------------------------------------
+
+Here is an example, problem 8.3 from Whitlock and Schluter's textbook.
+
+**The parasitic nematode *Camallanus oxycephalus* infects many freshwater fish, including shad. The following table gives the number of nematodes per fish (Shaw et al. 1998). Is there evidence that some fish are more or less likely to attract nematodes, or are the nematodes finding their way into the fish at random?**
+
+|                         |               |
+|-------------------------|---------------|
+| **Number of parasites** | **frequency** |
+| 0                       | 103           |
+| 1                       | 72            |
+| 2                       | 44            |
+| 3                       | 14            |
+| 4                       | 3             |
+| 5                       | 1             |
+| 6                       | 1             |
+
+**So this is a question about the distribution of parasites on fish. We suspect that the pattern is *random*.** Because we are testing how well our observed frequencies match expected proportions, we will use the chi-square goodness-of fit-test to look for differences. The trick here is that most of our work will come from having to generate the expected proportions using the Poisson distribution rather than the binomial.
+
+## **State our hypotheses and confidence level**
+
+H~0~: the number of nematode parasites on this fish has a Poisson distribution (that is, the distribution is random).\
+H~a~: the number of nematode parasites on this fish does not have a Poisson distribution.\
+Use ![LaTeX: \\alpha](https://canvas.suffolk.edu/equation_images/%255Calpha?scale=1 "\alpha"){alt="LaTeX: \\alpha"} = 0.05.
+
+## **Take raw data and turn it into a table**
+
+```{r}
+# Bring in the data from text example 
+mydata <- read.csv(url("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter08/chap08q02ShadParasites.csv")) 
+
+# Turn the raw data into a frequency table 
+parasiteTable <- table(mydata$numberOfParasites) 
+
+data.frame(Frequency = addmargins(parasiteTable))
+```
+
+## **Calculate the average number of hits, and make this mean an object**
+
+The next is to calculate the mean number of parasites from the *raw data* (not the summary table)
+
+```{r}
+meanParasites <- mean(mydata$numberOfParasites) #calculate the mean
+
+meanParasites # see the mean
+```
+
+## **Calculate the null distribution and the expected values**
+
+Now we can use the dpois function to calculate our expected values from a Poisson distribution given the mean we calculated. We use this mean value as the "lambda" value for these predictions. We can just spit them out as a list of expected values or put them in a table.
+
+```{r}
+totalParasites <- sum(mydata$numberOfParasites) # count the number of rows for the total sample size
+
+totalParasites
+```
+
+```{r}
+expectedProportion <- dpois(0:6, lambda = meanParasites) 
+# The 0:6 term repeats the calculation for 0 hits, 1 hit, 2 hits, etc.
+
+expectedPropTable <- data.frame(c(0:6), expectedProportion)
+
+expectedPropTable # see the table
+
+expectedFrequency <- expectedProportion * 238 
+
+expectedFrequency # see the expected values
+
+# now show the expected values in a table in the console to confirm that no category has fewer than 5 expected cases 
+
+expectedFreqTable <- data.frame(c(0:6), expectedFrequency) 
+
+expectedFreqTable # show the table
+
+# bring in a new dataset if you need to recombine the groups
+```
+
+## **Confirm that there are no expected values \< 1**
+
+Copy these expected values and then put them into Excel. If any of the expected values are less than 1, then we must combine them with the next larger one in Excel to make it work. **This step is not optional.** This is an assumption of the chi-square test so skipping this step will cheat the test and artificially inflate the probability of a Type I (false positive) error.
+
+I recommend combining these categories in Excel so it can do the calculations for you. Also use Excel to combine the probabilities into the "new expected" categories.
+
+::: callout-important
+Remember that the all the proportions must add up to 1.0. I recommend calculating the smallest category's proportion by summing the larger categories' proportions and subtracting that from 1.0.
+:::
+
+## **Run the test**
+
+Now we can run our goodness-of-fit test using our observed frequencies and expected *proportions* of our "new" categories: 0, 1, 2, 3, and ≥ 4:
+
+```{r}
+chisq.test(x = c(103, 72, 44, 19, 5), 
+
+p = c(0.388532618,
+      0.367310248,
+      0.173623542,
+      0.054713303,
+      0.015820299))
+```
+
+Finally, a result: we fail to reject the null hypothesis so we conclude that these results follow a Poisson distribution. This means that the occurrences or "hits" occur independently of one another, or we can say they are randomly distributed.\
+
+------------------------------------------------------------------------
+
+## **Conclusion: Are the data clumped or dispersed?**
+
+If we *had* rejected H~0~, how would we determine if the results were clumped or dispersed? One interesting attribute of the Poisson distribution is that the variance of the number of "hits" in each category is equal the mean µ (or lambda) of the population. **If the variance is greater than the mean, the distribution is *clumped*. If it is less than the mean, it is *dispersed*.**
+
+Just use this to calculate the variance of your distribution:
+
+```{r}
+var((mydata$numberOfParasites) / meanParasites)
+```
+
+Now, this number is *numerically* larger than µ, but remember that we failed to reject H~0~ in this case, so it's not significantly larger.
