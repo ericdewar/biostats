@@ -1,0 +1,2536 @@
+---
+title: "Bio 273 all scripts"
+author: "Eric W. Dewar"
+format: html
+editor: visual
+---
+
+# Bringing data into R
+
+So far, we've only entered data into the console directly. There are a few other ways to bring in data from **spreadsheets** or **built-in datasets** from R itself or **generate random data**.
+
+------------------------------------------------------------------------
+
+## Data from your own drive using the console
+
+### Using the desktop application
+
+This might be the most common way that we work with data—using spreadsheets from files on our own hard drives.
+
+#### Option 1
+
+Let's find the **SKL-bite.csv** dataset on your drive by entering `file.choose()` into the console.
+
+```{r}
+file.choose()
+```
+
+Running this function opens a dialog box where you can specify where to find this dataset. Once you locate it, R will report the path in the console. To bring in those data, copy the file path and create an object using the `read.csv` (combine or concatenate) function. Replace the part within the parentheses.
+
+```{r}
+teeth <- read.csv(replace-with-file-path-here)
+
+View(teeth) # previews the spreadsheet (data frame) in a tab
+```
+
+#### Option 2
+
+First, download a package called **readr** into R by entering this function into the console (or by executing this block):
+
+```{r}
+install.packages("readr")
+```
+
+Or you can use the **Install** button in the **Packages** pane and search for **readr**. You will only need to install it once.
+
+Now go to the **Files** pane and find the dataset from your drive. Click the file name to pop up a menu—click **Import Dataset...** to bring up another dialog box. This will allow you to inspect the dataset and import it, even being able to copy the code for your script☁️ Using Posit Cloud
+
+In the **Files** pane, select the **Upload** button. This will open a dialog box where you can select the file that you want to connect.
+
+### Using Posit Cloud
+
+You can file the file on your drive using the **Upload** button in the **Files** pane. Once you have the path, you can do it like the desktop version. To bring in those data, copy the file path and create an object using the `read.csv` (combine or concatenate) function. Replace the part within the parentheses.
+
+```{r}
+teethCloud <- read.csv(replace-with-file-path-here)
+
+View(teethCloud) # previews the spreadsheet (data frame) in a tab
+```
+
+------------------------------------------------------------------------
+
+## Data from GitHub
+
+For convenience in our class, I will frequently provide direct links to GitHub to avoid the need to fuss with data files. GitHub is a version-control system for file storage and sharing. I'll show more features later.
+
+Navigate over to our [class repository area](https://github.com/ericdewar/biostats/tree/master) (this pop-up link opens a browser tab). Then click **SKL-bite.csv** from the file list. Clicking the file opens a page that shows a preview and other stuff. Find the **Raw** button and right-click or option click so that a menu pops up. Choose **Copy link address**.
+
+To bring in those data, copy the URL and create an object using the `read.csv` (combine or concatenate) function, with the `url` part nested inside.
+
+```{r}
+teethGit <- read.csv(url("https://github.com/ericdewar/biostats/raw/refs/heads/master/SKL-bite.csv"))
+
+View(teethGit) # previews the spreadsheet (data frame) in a tab
+```
+
+\
+
+------------------------------------------------------------------------
+
+## Bringing in a built-in dataset
+
+R has a number of toy datasets preinstalled. You can see the full list of them with `data()`. We'll bring in a particular one called **Orange**:
+
+```{r}
+data("Orange")
+```
+
+Once that is brought into memory, it shows up in the environment pane as a `<promise>`. Click the name name to put it with the other data objects. It will appear in the console too.\
+
+------------------------------------------------------------------------
+
+## Generating random samples
+
+This function creates a vector that is a sample of 10 whole numbers taken randomly from 1 to 100 with replacement
+
+```{r}
+a <- sample(1:100, 10, replace = TRUE)
+a # "prints" or reports out the dataset
+```
+
+This makes a vector based on a normal distribution with a mean (center) of 50 and standard deviation (spread) of 5:
+
+```{r}
+n <- rnorm(n=100, mean=50, sd=5)
+```
+
+\
+
+------------------------------------------------------------------------
+
+## Using these objects in memory
+
+The function `mean()` gives the the sample mean for an array or "column" from a data frame. We'll work through more examples later.
+
+```{r}
+mean(a) #gives the mean of the object a
+```
+
+```{r}
+mean(Orange$age) #gives the sample mean for one column of a data frame
+```
+
+\
+
+------------------------------------------------------------------------
+
+# Describing data
+
+## Basic sample statistics
+
+The ideas here aren't difficult, but it's a necessary foundation for making estmates and inferences about data. For numerical data, we want to be able to describe the [central tendency]{.underline} and [dispersion]{.underline} of a sample. Categorical data are described by [proportions]{.underline} of outcomes.
+
+### Sample mean (or arithmetic mean)
+
+The **arithmetic mean** is the familiar "average" or "center of gravity" of a sample, or a typical value that we might expect from repeated sampling.
+
+In R, the command to calculate the mean is simple: it's just `mean`.
+
+```{r}
+
+# This creates a vector that is a sample of 40 whole numbers # taken randomly from 1 to 800 with replacement
+w <- sample(1:800, 40, replace = TRUE)
+
+w  # the object name alone reports the values in the console
+
+# You could sort the random data if you wanted
+data <- sort(w, decreasing = FALSE) 
+# decreasing = FALSE is an argument that tells R to sort the values from low to high
+
+data  #report the sorted object in the console
+
+# take the mean of the sorted vector object
+mean(data)
+```
+
+The console output always leads with a `[1]`. For longer vectors, it starts at one and when the output wraps around it shows the count.
+
+Notice that the output in the console shows the individual commands (functions) and the output. The Quarto output shows the output only.
+
+**Try this with a built-in dataset**
+
+```{r}
+# bring in the built-in dataset about the lengths of North American Rivers
+data("rivers")
+
+# calculate the sample mean for one column of a data frame (ignoring groups)
+mean(rivers) 
+```
+
+#### Getting means of separate groups
+
+Those calculations of the mean treat every observation as the same. Sometimes we want to calculate the means of groups within the data set. For this we use a different function called `tapply`.
+
+```{r}
+# bring in the dataset about weights of chickens raised on different types of feed
+data("chickwts")
+
+View(chickwts) # shows the dataset in the scripts pane
+
+# calculates the mean of ALL the data
+mean(chickwts$weight) 
+
+# calculate the means of each group in the sample
+tapply(chickwts$weight, chickwts$feed, mean) 
+```
+
+So, you see that we get the mean values for the six types of feeds.
+
+The general form of `tapply` (table apply) is `X` = the column we want, `INDEX` = the cartegorizing variable (feed types), and `FUN` = a function or operation that needs to be applied (the mean). Note that changing the function part will allow you to calculate other sample statistics across groups in a data frame: sd, median, length (i.e., sample size), quantile, etc.
+
+::: callout-caution
+Be aware that **the mean is very sensitive to outliers**. Use caution when reporting the mean or using mean-based statistics when our sample includes outliers. If we have a data set that has extreme outlier values or distributions that are skewed, then we should use the **median**, another measure of central tendency described below.
+:::
+
+### Standard Deviation
+
+The **standard deviation** (SD) describes the spread of a sample distribution—how different, in general, are different observations from the mean? The SD is derived from another measure of dispersion called the **variance**, but we prefer the SD because (for reasons of arithmetic) it keeps the same units as our observations.
+
+The SD from raw data is equally easy in R:
+
+```{r}
+sd(data)
+
+sd(rivers)
+
+tapply(chickwts$weight, chickwts$feed, sd) # calculate the SD of each group in the sample
+```
+
+**Note** that the **`object$column`** way will be the usual way that we will refer to objects most of the time for data from a spreadsheet that R uses as a data frame. You could also use **`sd(column, data = object)`** but my usual way lets you use the auto-suggest functions in R so you don't have to memorize the column headings.
+
+------------------------------------------------------------------------
+
+### The Median and Interquartile range
+
+The median and interquartile range are other descriptors of numerical data. The **median** is a measure of central tendency, but it's the "50% line" or middle value in our data when they are range from low to high. It shows us where half of our data are above and below the middle value. (When we have an even sample size, take the mean of the two middle numbers.) The **interquartile range** is the "middle 50%" of our data.
+
+As you might predict, in R the function to calculate the median is simply `median`. The other "quantiles" (25%, 75% levels, or others) are given by `quantile`.
+
+```{r}
+median(data) # gives the 50% line of the sample
+
+# gives all the quartiles of a sample, if that's what you want
+quantile(data) 
+
+# calculate the median of each group in the sample
+tapply(chickwts$weight, chickwts$feed, median) 
+```
+
+------------------------------------------------------------------------
+
+### The Standard Error
+
+When we are evaluating our confidence in the reliability of a sample mean, we don't use the standard deviation. The **standard deviation of the mean** describes the spread of a sample's distribution (rather than a population's)—how different, in general, are observations from the mean?
+
+Beginners may use these interchangeably, but we'll get fussier about this as we start learning statistical tests.
+
+The SD is calculated as $\frac{SD}{\sqrt{n}}$, but we don't usually have to calculate the standard error in R because statistics that require it will calculate it automatically. If we wanted to do it by hand in R it would be
+
+```{r}
+
+sd(Orange$age) / sqrt(length(Orange$age))
+# sqrt() is the square root function 
+# length() counts the data for the sample size
+
+# or to make it an object
+OrangeAgeSE <- sd(Orange$age) / sqrt(length(Orange$age)) 
+# a measure of the spread of the sampling distribution of the sample mean
+```
+
+------------------------------------------------------------------------
+
+#### But wait!
+
+These approaches work like this *when we are working from raw data*. If our data were represented in a frequency distribution table rather than a spreadsheet, we need to account for each observation.
+
+For example, if we had this frequency distribution of body heights:
+
+|            |           |
+|:----------:|:---------:|
+| **Height** | **Freq.** |
+|     61     |     1     |
+|     62     |     4     |
+|     63     |     5     |
+|     65     |     8     |
+|     66     |     4     |
+|     68     |     2     |
+|     70     |     1     |
+
+**The mean is not 65.0**. That's what we'd get if we added the height observations and divided by 7.
+
+The problem is that we have 25 observations. Our raw data would be this: 61, 62, 62, 62, 62, 63, 63, 63, 63, 63, 65...skipping a few... ending with 70. The mean is 1614/25 = 64.56.
+
+Don't mess that one up. That's rookie mistake.
+
+\
+
+------------------------------------------------------------------------
+
+# Graphics in base R
+
+Graphics like tables and figures are an important aspect of communicating information because when well-designed, they make it easier for us to us to communicate the "sense" of data far better than with sentences alone.
+
+There are rules for making successful graphics. Some of these are best practices that make good use of the abilities our eyes and brain has, but others are conventions depending on the kind of data that we are describing.
+
+R has a number of powerful tools for making publication-quality graphics. Many of them can be done with the `graphics` package that loads at startup in RStudio, but we can also use `ggplot2`, which is a `tidyverse` package that we have to activate when we want to use it.
+
+This tutorial will give examples of making tables and graphics in base R. A separate tutorial will explain the "grammar of graphics" used in `ggplot2`. This tutorial won't include every possible type of graph, but it will introduce a few useful ones and set you up to explore others as we work with different types of data soon.
+
+------------------------------------------------------------------------
+
+## Plotting in base R vs. `ggplot2`
+
+There are two ways that people make plots in RStudio. Both will result in clean, publication-quality graphics, and there are times when one might be preferable, but we should always aim for clarity in data presentation above all.
+
+The base R functions are helpful, but the functions in the package `ggplot2` (part of the `tidyverse` set) have a lot more presets and themes that are available. Always, *always* choose the approach that will give you the plot that will be most helpful to the viewer. Lots of extraneous shading or other non-data points might look cool on a slide, but our goal is always conveying the message of your data.
+
+------------------------------------------------------------------------
+
+## Categorical data
+
+### Making tables
+
+The first few examples will use my data set about the lengths (in cm) of the skulls of mammalian carnivores and the bite force that they can generate (in N). First we'll bring in the data as a **data frame**, which is a common data structure in R that we can think of as like a spreadsheet. In R, categorical variables need to be made into a data frame so that they can be counted.
+
+```{r}
+# bring in the data 
+sklbite <- read.csv("https://github.com/ericdewar/biostats/raw/refs/heads/master/SKL-bite.csv")
+```
+
+It's a good idea to use the functions in the next chunk to inspect the data. The following code chunk will open another tab in the script window over this Quarto tab when it's run in RStudio. You can just navigate back to here. I like to keep the `View` tab open when I'm working with a dataset because it's a pretty clean way to summarize the data and variable/column names.
+
+```{r}
+View(sklbite) # preferred?: opens the data as a tab in the script pane 
+
+head(sklbite) # optional: shows the first few rows of the dataset
+
+# or
+sklbite # this just reports the data frame in the console or Quarto
+
+```
+
+If we wanted to know how many species were represented within each family, we could count them manually, but R can do it for us in a few steps. Once you get how the workflow is set up, this is *a lot* easier and more reliable than doing it by hand for large data sets.
+
+Note that the following code chunk will result in three small output panels showing the results when we run them in RStudio. If you render this document they will appear one after the other.
+
+```{r}
+familyTable <- table(sklbite$family) # Makes a table object from the 'family' column of the data frame, listing the categories alphabetically
+
+familyTable <- sort(table(sklbite$family), decreasing = TRUE) # Sorts the table object by frequency
+
+familyTable # just reports back the sorted table in the console, listed in a row
+
+data.frame(Frequency = familyTable) # makes this a vertical table (more usable)
+
+data.frame(Frequency = addmargins(familyTable)) # makes a vertical table with the total if you want that
+```
+
+------------------------------------------------------------------------
+
+### Bar/column plots
+
+Bar plots are used to **describe frequency distributions of samples of categorical data**. A frequency distribution is the number of times each value of a sample occurs for Continuous data should be shown with histograms (more on them below). Bar plots should sort the categories from most frequent to less frequent. That will happen if you used the `sort` function above when you made the table.
+
+```{r}
+
+barplot(familyTable) #basic
+
+## base R with more options
+# ylab sets the label for the Y axis
+# las = 2 orients the labels horizontally 
+
+barplot(familyTable, ylab = "Frequency", las = 2, col = "firebrick")
+
+```
+
+The `las` argument (Label of Axis Style) used above for the base R plot lets us orient the tick mark labels for better readability. The options are:
+
+> `las = 1`: Parallel to axis (default)\
+> `las = 2`: Horizontal\
+> `las = 3`: Perpendicular to axis\
+> `las = 4`: Vertical
+
+Some of the labels can get cut off in the base R plot when viewed in the Quarto document. It won't always be a problem in the rendered document.
+
+Running that script in the console will make a plot appear in the Viewer tab. The margins can be set manually when needed and exported if you need (more later).
+
+[This website](https://r-graph-gallery.com/74-margin-and-oma-cheatsheet.html) elaborates a little on how to do it if you want to check it later on.\
+
+------------------------------------------------------------------------
+
+## Numerical data
+
+### Histograms
+
+Histograms look like bar plots, but they are one way to show the **distribution of a numerical variable across its observed range** in a sample. The "bars" of the plot are right up against each other (unlike the bar plot), implying that the bins for each part of the range are continuous with one another.
+
+We'll demonstrate making histograms using the carnivore bite force data set again.
+
+```{r}
+
+# in case you need to reload the dataset into memory
+sklbite <- read.csv("https://github.com/ericdewar/biostats/raw/refs/heads/master/SKL-bite.csv")
+
+# make a plot of the lengths of carnivore skulls in the sample
+# the $ indicates that we are plotting the length column of the dataset
+
+hist(sklbite$length, right = FALSE) #basic
+
+# main = "" makes a blank legend
+hist(sklbite$length, right = FALSE,
+     xlab = "Skull Length (cm)", ylab = "Frequency",
+     col = "violet",
+     main = "")
+
+
+# change the bin sizes
+hist(sklbite$length, right = FALSE,
+     xlab = "Skull Length (cm)", ylab = "Frequency",
+     xlim = c(0, 40),
+     col = "green4",
+     breaks = seq(5, 35, by = 2), # range 5-35 cm, bin sizes 2 cm each
+     main = "")
+
+```
+
+The `right = FALSE` indicates that the bins are left-bounded. This means if you had the data binned in 2 cm groups, then the bins would go from 0 to 2 and the next were 2 to 4, an observation of 1 would be included in the first bin but 2 would be in the next bin. You can decide how you want to define the borders of your bins in a way that describes your data in clearly.
+
+I usually use the "dollar sign" way to indicate which column of a data frame I want to work with, like this: `hist(sklbite$length)` but an alternative is `hist(length, data = sklbite)`. I like the first way better because this way I can use the autofill functions in the console or script window to suggest column names rather than having to remember them.
+
+------------------------------------------------------------------------
+
+### Boxplots
+
+Boxplots (also called box-and-whisker plots) are also used to show the distribution of numerical variables, especially when comparing different groups.
+
+```{r}
+
+# load a built-in data set about the weights of chicks on different feed types
+data("chickwts") 
+
+# The argument in the parentheses is Y ~ X
+boxplot(chickwts$weight ~ chickwts$feed) #basic
+
+# or you can assign colors to groups manually
+boxplot(sklbite$bite ~ sklbite$family, 
+        las = 2,
+        col = c("red", "orange", "yellow", "green", "lightblue", "violet", 
+                "orangered", "dodgerblue", "brown"),
+        xlab = "", ylab = "Bite force (N)")
+
+```
+
+The family groups don't have a lot of variation, but if you look at the felid, hyaend, or ursid groups, you'll notice what a typical boxplot looks like:
+
+-   the box shows the interquartile range, or the middle 50% of the data.
+
+-   the line in the box is the median, the 50% line of the data (*not* the mean)
+
+-   the whiskers depict the top and bottom 25% of the distribution
+
+-   the circles are outliers, which are observations that are noticeably away from the rest of the data. You can see them with the canid and viverrid groups.
+
+------------------------------------------------------------------------
+
+### Scatterplots
+
+Scatterplots are used to show the relationship between two numerical variables.
+
+```{r}
+
+plot(sklbite$bite ~ sklbite$length) #basic 
+# The argument in the parentheses is Y ~ X
+
+plot(sklbite$bite ~ sklbite$length, 
+     las = 1, # axis label oriented to read
+     pch = 16, col = "firebrick", # solid red circle icon
+     cex = 1.5, # expand icon to 1.5x
+     bty = "l", # make the box around the data an "L" shape
+     xlab = "Skull length (cm)", ylab = "Bite force (N)")
+
+```
+
+The function `pch` means "plotting character" used for data points. There are a bunch of preset icons (0-25) that can be used.
+
+![R plotting symbols](images/pch.png)
+
+You can also assign letters if you choose. There is more information in RStudio with `help(pch)` or many graphics-help websites (like [here](https://r-charts.com/base-r/pch-symbols/) and [here](https://r-graph-gallery.com/)).\
+
+------------------------------------------------------------------------
+
+### Stripcharts
+
+Stripcharts are like boxplots but represent each point in the group. This is another great plot type because it actually shows all the data. I recommend using a "hollow" plotting character (0-6 on the symbol-list figure above) so that you can see when they overlap.
+
+```{r}
+# bring in the built-in dataset chickwts again
+data("chickwts") 
+
+stripchart(weight ~ feed, data = chickwts, 
+           method = "jitter", 
+           las = 2, 
+           vertical = TRUE)
+
+stripchart(weight ~ feed, data = chickwts, 
+           xlab = "Type of feed", ylab = "Weight (g)", 
+           col = "firebrick", 
+           las = 2, 
+           method = "jitter", 
+           vertical = TRUE)
+```
+
+------------------------------------------------------------------------
+
+### Line plots
+
+Line plots show the changes in a numerical variable over time.
+
+```{r}
+data("Nile") # load the datset about water flow in the Nile River through time
+
+Nile # view the object in the console
+
+plot(Nile, type="l") #basic
+
+plot(Nile, type="l", las = 1, col = "blue", ylab = "Water Flow of Nile River", xlab = "Year")
+
+```
+
+------------------------------------------------------------------------
+
+## **Some take-home messages about levels of data and graphics:**
+
+-   When **describing frequency distributions of samples**, categorial data are described with bar charts but numerical data should be shown with histograms.
+
+    -   Numerical variables can be read straight from the "column" of a data frame (this is the way that CSV spreadsheets are usually treated in R).
+
+-   **Relationships between two numerical variables** are best shown by
+
+    -   a scatterplot for regular XY data comparisons (confirm that you [actually]{.underline} have two variables before using!)
+
+    -   a line graph if showing the trend of a variable over time
+
+-   **Relationships between two categorical variables** could be shown with:
+
+    -   a grouped bar chart
+
+    -   a mosaic plot (which has the advantage of expressing the difference in sample size *and* proportion).
+
+-   **Relationships between one numerical and one categorical variable** are described well by
+
+    -   strip charts
+
+    -   boxplots (also called box-and-whisker plots)
+
+    -   multiple (stacked) histograms
+
+    -   cumulative frequency distributions
+
+------------------------------------------------------------------------
+
+## Exporting plots to other applications
+
+Quarto documents look great, but sometimes you need to get your plots into a paper or poster. You can use the code from a quarto doc just by copy/pasting it to the console, which will make your plot appear in the **Plots** tab.
+
+From there, choose **Export \> Save as Image...** and a dialog box will open for you to adjust the size, choose the output format, specify where to save it, etc.
+
+::: callout-caution
+JPG is a good all-purpose "bitmap" format but it gets jagged if you increase its size for a poster because the image is saved as pixels.
+
+EPS is a "vector" graphical format, meaning that it's a bunch of graphic equations that are scalable when they are zoomed. I prefer this when I am using Adobe Illustrator or Photoshop.
+:::
+
+------------------------------------------------------------------------
+
+## Links to other resources
+
+[R graph gallery](https://r-graph-gallery.com/)
+
+[r-charts.com](https://r-charts.com/)\
+
+------------------------------------------------------------------------
+
+# What test do I use?
+
+We use different tests depending on the data/variables we have and the kind of question that we have. Most tests have assumptions that must the confirmed before analysis.
+
+![Which test do I use?](Which test do I use.jpg)\
+
+------------------------------------------------------------------------
+
+# Hypothesis testing and the binomial distribution
+
+## Working with observed binomial data in R
+
+The hand calculation for this is a bit of a chore, but the good news is that there is an easy way to calculate the probability of a single event.
+
+A prevous biostats class had 34 people with brown eyes out of 39 students, so Pr\[brown\] = 0.872. If I chose students at random from that group in groups of 5. Calculate the probability of randomly selecting 3 brown-eyed people out of those 5 when the probability of a hit (that is, selecting a person with brown eyes) is 87.2%.
+
+```{r}
+dbinom(3, size = 5, prob = 0.872)
+```
+
+What is the probability of getting 3 or more hits in groups of 5?
+
+This is Pr\[3 or more\] = Pr\[3\] + Pr\[4\] + Pr\[5\]
+
+```{r}
+dbinom(4, size = 5, prob = 0.872) 
+dbinom(5, size = 5, prob = 0.872) 
+
+# then sum all these probabilities
+```
+
+Or you could use this:
+
+```{r}
+# calculate the number of hits from 3 to 5
+xsuccesses <- 3:5
+
+# do each calculation
+probx <- dbinom(xsuccesses, size = 5, prob = 0.872)
+
+# make a table from those two values
+probTable <- data.frame(xsuccesses, probx)
+
+# display the table
+probTable
+```
+
+Another way to make the histogram: a barplot with 0 space between the bars
+
+```{r}
+barplot(height = probx, names.arg = xsuccesses, space = 0, las = 1, col = "brown", ylab = "Probability", xlab = "Brown-eyed people in biostats")
+```
+
+### Hypothesis testing with the binomial distribution (general format)
+
+```{r}
+# calculate the number of hits from 0 to 10
+xsuccesses <- 0:10
+
+# do each calculation, assume that Pr[X] = 0.28
+probx <- dbinom(xsuccesses, size = 50, prob = 0.28)
+
+# make a table from those two values
+probTable <- data.frame(xsuccesses, probx)
+
+# display the table
+probTable
+
+# Use this function to sum up those probabilities
+sum(probx)
+
+# OR to do the one-tailed test in one step without making the table, use this:
+binom.test(10, n = 50, p = 0.28, alternative = "less")
+```
+
+### Example from a spreadsheet
+
+```{r}
+# bring in the survey data
+drinks <- read.csv(url("https://github.com/ericdewar/biostats/raw/refs/heads/master/drinks.csv"))
+
+# count the number of coffee drinkers
+nullTable <- table(drinks, dnn = "coffee")/length(drinks)
+
+# make this value in the data frame format (like a spreadsheet)
+data.frame(nullTable)
+
+# calculate the probability of coffee drinkers
+prCoffee <- (sum(drinks$response == "coffee"))/(length(drinks$response))
+
+# calculate the single probability of getting 2 coffee drinkers out of 4
+dbinom(2, size = 4, prob = prCoffee)
+
+# Test to see if having 8 coffee drinkers out of 10 is significantly different than what would be expected
+binom.test(8, n = 10, p = prCoffee, alternative = "greater")
+```
+
+## Sampling distribution (CI) of the proportion
+
+There is an add-on package called "binom" that will bring in more functions than what is in base R. If you didn't add it from the yellow menu flag when you opened this document for the first time, the following line only needs to be run once:
+
+```{r}
+install.packages("binom", dependencies = TRUE) ## Run this just once to install
+```
+
+Load the `binom` package each session that you want to use it:
+
+```{r}
+library(binom)
+
+# calculate the 95% CI
+binom.confint(29, 50, method = "ac")
+
+# or see all the 95% CIs:
+binom.confint(10, 50)
+```
+
+\
+
+------------------------------------------------------------------------
+
+# Chi-square tests
+
+**Chi-square tests** are used to compare relationships between variables measured at the nominal scale. These tests look for differences among frequencies or departures from expected frequencies.
+
+The test algorithm might be familiar for people who have taken genetics:
+
+$$
+\chi^2 = \sum {\frac{(observed-expected)^2}{expected}}
+$$
+
+This test has to include its degrees of freedom, which is related to the number of categories included:\
+DF = \# categories – 1 – the number of parameters estimated by the data (in most cases this will be 0).
+
+The assumptions of this test are:
+
+1.  Observations are taken at the nominal scale. Categories of the nominal scale are represented as mutually exclusive.
+
+2.  Observations are independent of one another.
+
+3.  No category has an expected frequency of less than 1, or if there are lots of categories, not more than 20% of the categories can have an expected frequency \< 5.
+
+### Goodness-of-fit
+
+We can use chi-square to see if a set of observations fit our expectations.
+
+Let's say that we have a bunch of flowers, and we think that flower petal coloration is determined by a simple Mendelian gene. If this were true, then we would expect a color ratio of 3 yellow to 1 white. We observed 100 flowers and found 84 yellow and 16 white. Can we determine if these follow expected Mendelian ratios at a confidence level of $\alpha$ = 0.05?
+
+So, we need to determine what our expected frequencies are. Given 100 flowers with a 3:1 ratio, we would expect 75 yellow and 25 white.
+
+**H~0~**: Ratio of yellow to white is 3 : 1\
+**H~a~**: Ratio of yellow to white is not 3 : 1
+
+In R we use the `chisq.test` function:
+
+```{r}
+# make a vector of observed *values*
+obs <- c(84, 16)  
+
+# make a vector of expected *proportions*. 
+#   NOTE: A fractional format will always work, but R will choke if the proportions 
+#   don't add up to 1.0 exactly
+
+exp <- c(3/4, 1/4)
+
+# do the test
+chisq.test(x = obs, p = exp)
+```
+
+This **test statistic** (the value for chi-square) results in a P-value of 0.038, so we would reject the null hypothesis that the flowers have a 3 : 1 color ratio. Based on this, we conclude that the gene that controls flower color is not a Mendelian one.
+
+### Goodness-of-association
+
+Another use of chi-square is to see if disproportionate relationships exist between a category variable and a grouping variable. Consider this example that companies severity of lesions with age. For these data,
+
+**H~0~**: There is an relationship between age and lesion severity.\
+**H~a~**: Lesion severity depends on age.
+
+```{r}
+ 
+# bring in the data. Fill in with your file path.
+lesions <- read.csv(url("https://raw.githubusercontent.com/ericdewar/biostats/refs/heads/master/lesions.csv"))
+
+# make grouping variables
+lesions$age <- factor(lesions$age, 
+ levels = c("30-39", "40-49", "50-59", "60-69"))
+
+# make those data a table
+lesionsTable <- table(lesions$age, lesions$severity)
+
+# and add the marginal totals on the table
+addmargins(lesionsTable)
+
+
+# If you want a mosaic plot of these data
+mosaicplot( t(lesionsTable), col = c("red2", "yellow", "green3", "blue"), 
+ cex.axis = 1, main = "", las = 2,
+ sub = "Lesion severity", ylab = "Age")
+
+     
+# do the test of association
+chisq.test(lesions$age, lesions$severity, correct = FALSE)
+```
+
+In this case, the P-value of 0.62 is way higher than the usual confidence level of 0.05, so we fail to reject the null hypothesis.
+
+------------------------------------------------------------------------
+
+## Fisher's exact test
+
+Sometimes we have contingency tables that have only two rows and two columns. We can use the usual goodness-of-association test or we can use Fisher's exact test, which compares outcomes to expected probabilities like chi-square but using a different probability called the odds ratio.
+
+```{r}
+vampire <- read.csv(
+  url("https://whitlockschluter3e.zoology.ubc.ca/Data/chapter09/chap09e5VampireBites.csv"),
+  stringsAsFactors = FALSE)
+```
+
+Make the 2 x 2 contingency table (Table 9.5-1).
+
+```{r}
+vampireTable <- table(vampire$bitten, vampire$estrous)
+vampireTable
+```
+
+## 𝜒2 contingency test
+
+Get the expected frequencies under null hypothesis of independence using `chisq.test()`. R complains because of the violation of assumptions, but this is just advisory.
+
+H0: There is no association between estrous status of cows and bites by vampire bats.\
+Ha: An association exists between estrous status of cows and bites by vampire bats.
+
+Use $\alpha$ = 0.05
+
+```{r}
+chisq.test(vampire$bitten, vampire$estrous, correct = FALSE) 
+
+
+```
+
+Compare this result with the Fisher test:
+
+```{r}
+fisher.test(vampire$bitten, vampire$estrous)
+```
+
+In this case, the results were similar, but with less clear data Fisher's test should be more powerful (i.e., better able to reject a correct null hypothesis).
+
+### Conclusion
+
+There are other applications of the chi-square test, but these two will get you pretty far. Soon we'll get to working with data that are ratio-level in information.  
+
+\
+
+------------------------------------------------------------------------
+
+# Insert corrected Poisson here
+
+------------------------------------------------------------------------
+
+# The Normal Distribution
+
+When we collect enough ratio-scale data, we often see that our sample's frequencies are distributed normally.
+
+The normal distribution (ND) is special because has universal properties. Not every apparently "bell-shaped" curve is truly normal, but the ones that are normal have these attributes in common that allow us to do statistical tests with them:
+
+-   The **ND is defined by** $\mu$ **and** $\sigma$ (or $\bar{Y}$ and *s* for samples). The height of the curve is a probability density function, but statisticians have used calculus to integrate the area under the curve from some observation $Y_{i}$ to another observation—knowing this area allows us to assign a probability to the range, and that we can use to inform statistical tests.
+
+-   The **ND is perfectly symmetrical about its height** of its peak, which is also the location of the mean, median, and mode of the distribution.
+
+-   The **ND has known proportions that let us assess the probability of an outcome**. The total area under the curve is 100% or 1.0, and:
+
+    -   ± 1 SD = \~66% of the area under the curve
+
+    -   ± 1.96 SD = 95% of the area under the curve
+
+    -   ± 3 SD = \~99% of the area under the curve\
+
+------------------------------------------------------------------------
+
+### The *Z* score (standard normal deviate)
+
+When both $\mu$ and $\sigma$ of a population is known, we can use this score to predict the placement of a given observation in relation to the mean. The equation is
+
+$$
+Z = \frac{Y_i - \mu}{\sigma}
+$$
+
+Where $Y_{i}$ is a given observation, $\mu$ is the population mean, and $\sigma$ is the population standard deviation. The *Z*-score gives the placement of your observed $Y_{i}$ along the X axis. From there we can calculate the area from there under the curve.
+
+First, let's get a sample from a normal distribution with $\mu$ and $\sigma$ by sampling 10,000 numbers from a population with a mean of 100 and an SD of 5:
+
+```{r}
+# make a vector that is a large sample from an ND
+mydata <- rnorm(n=10000, mean=100, sd=5)
+```
+
+Here are some sample statistics ($\bar{Y}$ and s); they probably won't exactly match our population exactly because this is a sample from the population, but they should be close. You can run the block above and the one below this to see how it changes if you repeatedly make new samples and report the sample statistics.
+
+```{r}
+# report the sample statistics
+mean(mydata) 
+sd(mydata)
+```
+
+Make a histogram of your sample. Note that **freq = FALSE** will give the density function; leaving out that argument will make the Y-axis frequency rather than probability density
+
+```{r}
+# histogram of the sample
+hist(mydata, main ="", col = "goldenrod1", xlim = c(80, 120), freq = FALSE, xlab = "") 
+```
+
+We can also add a density curve to estimate the population distribution. If we could observe every member of the population (or sample infinitely from it, I suppose) this line should be the true distribution of the population's outcomes. The **`curve`** function will overlay a smoothed line over the histogram in the plot pane. The argument **`add = TRUE`** overlays the curve on your existing histogram **`lwd=3`** specifies the width of the line.
+
+```{r}
+# histogram of the sample again
+hist(mydata, main ="", col = "goldenrod1", xlim = c(80, 120), freq = FALSE, xlab = "") 
+
+# then plot a smooth curve approximating the population
+curve(dnorm(x, mean=mean(mydata), sd=sd(mydata)), add=TRUE, col="darkblue", lwd=3)
+```
+
+------------------------------------------------------------------------
+
+#### An example of using the *Z* score
+
+Imagine that this sample came from observations of the weights of newborn domestic shorthair cats. If a kitten named **Alice** weighed exactly 100 g, then
+
+$$
+Z = \frac{100-100}{5} = 0
+$$
+
+The *Z*-score is 0. Note that I think that it helps to sketch out a normal distribution on paper to make sure that we can visualize how our data compare to the mean and which area under the curve we are looking to estimate.
+
+Now use `pnorm` to give the P-value for a given *Z* score. The argument **`lower.tail = TRUE`** specifies that we want the area of the curve to the left of (smaller than) the observation. **`lower.tail = FALSE`** gives the area to the right of (larger than) the observation.
+
+```{r}
+pnorm(100, mean = 100, sd = 5, lower.tail = TRUE)
+```
+
+When the *Z* score is 0 that means that [50% of the area under the curve]{.underline} is to the left of Alice's weight because she's right at $\mu$.
+
+We weigh another cat, **Bernie**, who weighs 105.6 g, so
+
+$$
+Z = \frac{105.6-100}{5} = 1.12
+$$
+
+```{r}
+pnorm(105.6, mean = 100, sd = 5, lower.tail = TRUE)
+```
+
+When Z = 1.12, [87% of the curve]{.underline} lies to the left of that observation.
+
+But what about **Casey**, a kitten born at 97.3 g? Her place along the distribution is
+
+$$
+Z = \frac{97.3-100}{5} = -0.29
+$$
+
+```{r}
+pnorm(97.3, mean = 100, sd = 5, lower.tail = TRUE)
+```
+
+This gives me Casey's percentile weight: 29% of the population would be smaller than her and 71% would be larger.
+
+By now you've noticed that The Z-score is an intermediary between the raw observation and the observation's place along the distribution. In R we skip that step by going right to the P-value of that observation (or the percentile of that observation in the distribution).
+
+One last use of the *Z* test is not just the placement of individual points along the curve, but the area of the curve *between* two observations on the curve.
+
+What percentage of cats would be expected to be between Casey and Bernie?
+
+So we're comparing Casey (at the \~30th percentile) with Bernie (at the \~87th percentile). In R this could be done like
+
+```{r}
+c <- pnorm(97.3, mean = 100, sd = 5, lower.tail = TRUE)
+b <- pnorm(105.6, mean = 100, sd = 5, lower.tail = TRUE)
+b - c
+```
+
+So 57.4% of kittens should be between Casey and Bernie in birth weight. It's a good idea to sketch out a curve so that we can keep straight what areas we're subtracting.\
+
+------------------------------------------------------------------------
+
+## Testing hypotheses with the *Z* score
+
+The *Z* score gives us probabilities of outcomes. Once we get toward the tails of the distribution (past *Z* = 1.96), the probabilities start to get smaller fast.
+
+Consider the cats from above and imagine that we had one big cat (**Dario**) whose birth weight was 115.6 g. Is Dario significantly larger than the rest of the kittens from this population? This is a one-tailed test because I think that he's bigger than other kittens, not just "different" in size. Let's set our significance level at $\alpha$ = 0.01.
+
+H~0~: Dario is smaller or equal in birth weight to other kittens ($\mu$ ≤ 0).
+
+H~a~: Dario is larger than these other kittens ($\mu$ \> 0).
+
+```{r}
+pnorm(115.6, mean = 100, sd = 5, lower.tail = FALSE)
+```
+
+Yikes. The probability of getting a domestic shorthair kitten this chonky when the mean weight is 100 g with a standard deviation of 5 g is P = 0.0009. This is much less than our confidence level of 0.01, so we can say, no, this cat would be not a part of the reference population. Maybe it's some bigger breed like a Maine Coon or something, but it's really unusual for a member of the population (domestic shorthair newborns) we've been referring to. Furthermore, we'd expect to be wrong in our conclusion far less than 1% of the time because P = 0.0009.
+
+------------------------------------------------------------------------
+
+## Conclusion
+
+The *Z* test is a very powerful test for ratio-level data [when we have a lot of parametric knowledge]{.underline} (i.e., both the parametric mean and parametric SD). However, in practice we usually don't know everything about our reference population (particularly the SD). Luckily, we have another test (the *t* test) that can help us in those situations by estimating the standard deviation based on our sample.
+
+\
+
+------------------------------------------------------------------------
+
+# Estimating the normal distribution with *t* tests
+
+We know that when very large sample sizes are observed that they tend to be distributed normally (with a normal distribution). The predictability of the proportions of the normal distribution make the *Z*-test a powerful one. (Remember that a test with statistical "power" means that the algorithm has a good ability to discern differences or relationships between groups.) The problem with the *Z*-test is what it requires to work—we have to know the parametric standard deviation $\sigma$ for it to work. We rarely get "true" parametric knowledge of biological populations.
+
+All statistical tests have assumptions. When we start working with data that are not as strictly probabilistic as flipping coins or rolling dice, then we need to test to see if those assumptions about our data are correct. Luckily, formal tests have been developed to assess our data for normality and equality of sample variances.
+
+**The general workflow for a statistical test like *t* is:**
+
+1.  Formulate the question to be answered.
+2.  State null and alternative hypotheses with appropriate tailedness
+3.  Decide on a level of significance ($\alpha$ \< 0.05 or lower)
+4.  Test to see if the data are normally-distributed (also the check the variances for a two-sample test)
+5.  If fail to reject H~0~ in step 4, then run the *t* test
+6.  State conclusion, test statistic, degrees of freedom, and P-value
+
+------------------------------------------------------------------------
+
+## The one-sample *t* test
+
+In 1908, William Sealy Gosset, a statistician working for the Guinness Brewing Company, discovered a test for analyzing small sample sizes that were approximately normally-distributed. The [lore](https://priceonomics.com/the-guinness-brewer-who-revolutionized-statistics/) of this is famous for statisticians. This test and distribution has come to be called **Student's *t*** or the ***t*** **test**. Its formula is
+
+$$t=\frac{\overline{Y}-\mu}{SE_{\overline{Y}}}$$
+
+Notice that it has the basic layout of *Z* because it compares an observation or sample mean to a parametric (or comparison) mean divided by the dispersion of the population—but here the parametric $\sigma$ is *estimated* by the sample's **standard error of the mean**. The standard error (or SE or SEM or $SE_{\overline{Y}}$) is the standard deviation of the estimate of the mean that accounts for the sample size, calculated like this:
+
+$$
+SE_{\overline{Y}} = \frac{s}{\sqrt{n}}
+$$
+
+In R, we could calculate the SE with `sd(x) / sqrt(length(x))`. However, in practice we rarely calculate the SE for its own sake—usually it's calculated by R in the background when needed for tests like *t* and other tests that we'll use later.
+
+The result is a normalish-looking distribution, but (1) the proportions are a little different in the tails (the area we're usually interested in) and (2) the shape of the distribution changes as the sample size increases. This means that we have to keep track of the degrees of freedom. For a one-sample *t* test, df = *n* - 1. At sufficiently large samples (say, *n* \> 30), the distribution of *t* approximates the shape of a normal distribution quite closely.
+
+This test has assumptions:
+
+-   Data are randomly sampled from a single population
+
+-   The variable is either interval or ratio-scale data. It can be continuous or may be discrete if it can attain a large range of values.
+
+-   The data are approximately normally distributed: that is, not skewed and without outliers. We'll test for that.
+
+    -   Check this with the **Shapiro-Wilk test** (`shapiro.test)`. It tests the null hypothesis that the data are normally-distributed: rejecting H~0~ means that the data are non-normal so we would have to use an alternative to the *t* test
+    -   We can compare the sample with expectations *visually* with a **quantile-quantile (Q-Q) plot** (`qqnorm`)
+
+### Using the *t* test
+
+Here is an example: Imagine I observed a sample of intertidal crabs, and I want to know if their internal temperature at low tide is different than the temperature of the air at that time (24.3 °C). Let $\alpha$ = 0.05.
+
+H~0~: The crabs' temperature is the same as the air ($\overline{Y}$ = 23.3 °C).\
+H~a~: The crabs' temperature is different than the air ($\overline{Y}$ ≠ 23.3 °C).
+
+```{r}
+# make a vector of the data
+crabs <- c(25.8, 24.6, 26.1, 22.9, 25.1, 27.3, 24.0, 24.5, 23.9, 26.2, 24.3, 24.6, 23.3, 25.5, 28.1, 24.8, 23.5, 26.3, 25.4, 25.5, 23.9, 27.0, 24.8, 22.9, 25.4)
+```
+
+Now, one of the assumptions of the *t* test is that the data are "approximately normally distributed." We chec for that using another statistical test called the Shapiro-Wilk test. It tests the H~0~ that the data are normally distributed. Failing to reject H~0~ means that they are normal and you can use the "straight" *t* test. We can also visualize the distribution of our sample vs. a hypothetical normal distribution using a quantile-quantile plot (Q-Q plot).
+
+```{r}
+# Test for normality of data. A *non-significant* result means that they are normally distributed. 
+shapiro.test(crabs)
+```
+
+```{r}
+# A Q-Q plot that is non-normal will have noticeable gaps or breaks in the distribution
+qqnorm(crabs)
+```
+
+The result of the Shapiro-Wilk test tells us that the data are normal enough to satisfy the assumptions of the *t* test. The Q-Q plot shows that the data lie pretty close to the straight diagonal line that would be predicted for a truly normal sample. We'll talk later about what to do if your data fail to meet this assumption.
+
+It's not perfect, but close enough to let us use the straight *t* test. So let 'er rip!
+
+```{r}
+# Do the test and specify that the population mean is 24.3 
+
+shapiro.test(crabs) # tests the H0 that sample is normally-distributed
+
+t.test(crabs, mu = 24.3)
+```
+
+So, we calculated a value of *t* = 2.7128 at 24 degrees of freedom. The two-tailed critical value at df = 24 [(from a *t* table)](https://en.wikipedia.org/wiki/Student%27s_t-distribution#Table_of_selected_values) is 2.06. Because our calculated value for *t* exceeds this critical value, we can reject the null hypothesis. The output shows that P = 0.01215.
+
+Notice that the output also includes the 95% CI for the population mean by default, and that 24.3 is not in that range. If you wanted a different CI width, you can specify it with the `conf.level =` argument, like this:
+
+```{r}
+# Do the test and specify that the population mean is 24.3 but use a 99% confidence level
+t.test(crabs, mu = 24.3, conf.level = 0.99)
+```
+
+So our $\overline{Y}$ = 25.028 °C. What if we wanted to ask if the crabs were *hotter* than the air temperature, not just different than 24.3 °C? Then we'd do this:
+
+H~0~: The crabs' temperature is lower than or the same the air ($\overline{Y} \le$ 23.3 °C).\
+H~a~: The crabs' temperature is warmer than the air ($\overline{Y}$ \> 23.3 °C).
+
+```{r}
+# Use the crab vector from before
+
+# Do the test and specify that the population mean is 24.3
+
+# Also specify the tailedness with the argument alternative = "greater" or "less". You can specify just the initial letter.
+
+t.test(crabs, mu = 24.3, alternative = "g")
+```
+
+Why is it so much more significant? Because we've put our whole area of rejection into the right tail instead of splitting that 5% up between the two. The critical value from the table is way lower, too: $t_{\alpha\left(1\right),\:24}$ = 1.71.
+
+::: callout-important
+By the way, note the confidence interval from the one-tailed output. The 95% CI [**isn't "infinite"**]{.underline} on the upper bound. That's a quirk of how R displays the output of a one-tailed test. This shows where the extreme bound is in the direction of your hypothesis test. In this case, 24.57 is the *minimum* value for the confidence band. If you do want the 95% CI, then just run a two-tailed test. The two-tailed CI of $\mu$ is the same regardless of whether you are testing a one-tailed or two-tailed hypothesis.
+:::
+
+### *t* tests with summary statistics rather than raw data
+
+If you only have summary statistics like a mean and a standard deviation, this can be used too. This is handy if you are working backwards from summarized data from a paper rather than from raw data. You'll need to download the package `BSDA` using `install.packages("BSDA")`. This tests the same null hypothesis, that the difference between the sample mean and the population mean is 0.
+
+For this example, if you had a sample mean of 0.01, a sample standard deviation of 0.1, and sample size of 5, then you could use this:
+
+```{r}
+library(BSDA)  #install the package; only needed once
+
+# t test for sample mean of 0.01, a sample standard deviation of 0.1, and sample size of 5
+tsum.test(mean.x=.1, s.x=.01, n.x=5)
+
+# the warning just states that there is a default arugument (of equal variances) that is being ignored for a one-sample test.
+```
+
+------------------------------------------------------------------------
+
+## Comparing two means
+
+There are times when we want to compare a sample mean to a parametric value. Perhaps more commonly, we want to compare the means of two samples to see if they represent different populations. There are two such tests: **paired-sample tests and independent-sample tests**.
+
+### Before and After: Tests for paired or related samples
+
+"Paired" tests are used in situations when we want to compare the change (error variance) of each individual in a group before and after a treatment. Consider if we wanted to test the effects of a drug for lowering cholesterol. A group of people would have their levels measured before treatment and then again afterward. These two observations (usually just framed as "before" and "after") are *not independent of one another* because they're done on the same person. If we ignored that, then we would see a lot of trends that were only due to the similarities of the subjects themselves (a problem called autocorrelation).
+
+So, first we pair up the data and then calculate the average difference ($\overline{d}$) between the two sampling points. The formula itself is very similar to the one-sample *t* test:
+
+$$
+t\:=\:\frac{\overline{d}-\mu_{d_0}}{SE_{\overline{d}}}\text{, where }SE_{\overline{d}}\:=\frac{\:s_d}{n}
+$$
+
+However, here we are comparing the observed before/after differences to the differences we would expect if there were no effect due to the treatment ($\mu_{d_0}$ = 0). We can also set a standard of some value if "success" means more than a particular difference (that is, $\mu_{d_0}$ could be set to 10 or 50).
+
+The paired *t* test has *n* – 1 degrees of freedom, where *n* is the number of *pairs* of observations (or the number of differences).
+
+The paired *t* test is testing the hypothesis of no difference between the two sampling points, but in practice we usually use the one-tailed construction—we usually want to know if a treatment improved or increased/decreased an attribute—not just made it *different* than before. I like to calculate the differences as "after – before" comparisons so that the signs make intuitive sense to the question:
+
+H~0~: There is no treatment effect or it decreased the desired outcome (A $\le$ B or $\overline{d}$ ≤ 0).\
+H~a~: The treatment increased the desired outcome (A \> B or $\overline{d}$ \> 0). (or vice versa if a decreased value is desirable)
+
+This test has [assumptions]{.underline}, and they are mostly like the one-sample *t* test:
+
+-   The data are randomly sampled from a population of interest.
+-   The variable is at the ratio or interval scale.
+-   The [difference]{.underline} between the observations of the variable are normally-distributed.
+-   Each individual is observed twice, before and after the treatment; if not, we compare matched pairs of individuals. Either way, $n_1$ = $n_2$. This is necessary, say, if the first observation requires that the subject had to be sacrificed after the observation. For example, maybe we needed to weigh the dry weight of the pancreas of rats, requiring surgical removal. The "after" observation would be made on an individual that was as similar as possible (sex, weight, age, etc.) as the individual from the "before" observation.
+
+#### Using the paired *t* test
+
+Imagine that I am testing the effects of a Very Low Calorie Diet (VLCD) on a sample of young women. My data are their weights (masses) in kg:
+
+**Before**: 117.3 111.4 98.6 104.3 105.4 100.4 81.7 89.5 78.2\
+**After**: 83.3 85.9 75.8 82.9 82.3 77.7 62.7 69.0 63.9
+
+Did the VLCD cause these subjects to lose weight ($\alpha$ = 0.05)?
+
+H~0~: The VLCD caused these subjects to gain weight or stay the same (A ≥ B or $\overline{d}$ ≥ 0).\
+H~a~: The treatment caused weight loss, the desired outcome (A \< B or $\overline{d}$ \< 0).
+
+In this example, there are nine pairs of observations, so there are 9 – 1 = 8 degrees of freedom. The critical value for rejection is $t_{0.05\left(1\right),8}$=-1.86. Why negative? Because we set up our differences as A – B differences. This means that if our calculated value for *t* from the data is more extreme than –1.86 we can reject the null hypothesis with P \< 0.05.
+
+```{r}
+# Make vectors of the observations 
+before <- c(117.3, 111.4, 98.6, 104.3, 105.4, 100.4, 81.7, 89.5, 78.2) 
+after <- c(83.3, 85.9, 75.8, 82.9, 82.3, 77.7, 62.7, 69.0, 63.9)
+
+# Combine those arrays into a data frame
+vlcd <- data.frame(before, after)
+
+# Calculate the differences between each pair and insert a new column
+vlcd$difference <-(vlcd$after - vlcd$before) ## This makes lost weight negative numbers
+
+# Inspect the differences to see if they appear to be normally-distributed
+hist(vlcd$difference, right = FALSE, col = "skyblue", main ="", xlab = "After - Before Difference")
+```
+
+Uh, yeah, I think that looks pretty darn normal, but we have to test for it anyway:
+
+```{r}
+# Test for normality of data. A non-significant result means that they are normally-distributed. 
+shapiro.test(vlcd$difference)
+
+# Normality can be visualized with a Q-Q plot
+qqnorm(vlcd$difference)
+```
+
+We can also visualize the differences due to the treatment in a "bump chart" like this.
+
+```{r}
+# Reshape your data into a new matrix 
+vlcd2 = reshape(vlcd, varying = 1:2, direction = "long", 
+                idvar = "vlcd", v.names = "weight", 
+                times = factor(c("before","after"), levels = c("before","after")))
+
+# Make a strip chart from that new matrix
+stripchart(weight ~ time, data = vlcd2, 
+           vertical = TRUE, 
+           col = "firebrick",
+           ylab="Body mass (kg)", las = 1, 
+           pch = 16)
+
+# Add the lines to track subjects
+segments(1, vlcd$before, 2, vlcd$after)
+```
+
+Okay, so let's do the test already. Either one of these will give you the same result:
+
+```{r}
+t.test(vlcd$after, vlcd$before, paired = TRUE, alternative = "l") ## if you didn't calculate the differences first
+```
+
+or
+
+```{r}
+t.test(vlcd$difference, alternative = "l") ## if you did calculate the differences first
+```
+
+Note that if we didn't include the argument `alternative = "less"` then we'd get the two-tailed result.
+
+So, we have a calculated *t* of -12.74 which throws us farther into the area of rejection than our $t_{0.05\left(1\right),8}=-1.86$. We can conclude that the VLCD treatment cause these subjects to lose weight (P \< 0.001).
+
+------------------------------------------------------------------------
+
+## Two-sample *t* test (for independent samples)
+
+The two-sample *t* test assesses the null hypothesis that two samples come from the same population. Particularly, we want to know if the two populations have the same mean. The hypotheses tested are:
+
+${H_0}$: $\mu_1=\mu_2$ (or $\overline{Y}_1=\overline{Y_2}$)\
+${H_a}$: $\mu_1\ne\mu_2$ (or $\overline{Y}_1\ne\overline{Y_2}$)
+
+The formula for the test is $$t = \frac{(\overline{Y}_1 - \overline{Y}_2)-(\mu_1 - \mu_2) }{SE_{Y_1}-SE_{Y_2}}= \frac{(\overline{Y}_1 - \overline{Y}_2)-(0) }{SE_{Y_1}-SE_{Y_2}}$$
+
+We assume that the term $\mu_1-\mu_2$ is zero because we are testing the null hypothesis that the means of the two populations are equal. In the rare case that you wanted to test whether the two samples had a difference of 8 or something, then you'd have a 8 instead of 0 in that part of the equation. The denominator is a value called the "pooled variance," which is a drag to calculate by hand but R will knock it out like that's it's job. Which it is.
+
+This test's assumptions are:
+
+-   Random sampling from two populations of interest
+-   The measured variable is approximately normally-distributed and continuous and at the interval or ratio scale.
+-   If the variable is discrete, it must be assume a large range of values.
+-   The variance (and SD) of the numerical variable is the same for both populations. (We will test for this.)
+-   The degrees of freedom are calculated as df = $n_1 + n_2$ – 2.
+
+### Using the two-sample *t* test
+
+The development of a vaccine against HIV has proven a multi-decade challenge for medicine. One effect of HIV disease is the destruction of the CD4 T cells that make antibodies. Vaccine researchers studied a strain of "humanized" mice that carried human CD4 cells (which are susceptible to infection by HIV). Treatment mice received human antibody-producing genes via a harmless retrovirus. Control mice were injected with a reporter gene instead. Did the treatment help to preserve CD4 cells?
+
+H~0~: Treatment mice had fewer or the same number of CD4 cells ($\mu_1\le\mu_2$).\
+H~a~: Treatment mice had more living CD4 cells ($\mu_1\gt\mu_2$).
+
+```{r}
+# Bring in the data from this website 
+mice <- read.csv(url("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter12/chap12q17HIVAntibody.csv"))
+```
+
+I like to use the package called `lattice` to do a stacked histogram. Click it to activate it in the "Packages" pane or use this function. The syntax is a little different than base R, though.
+
+```{r}
+library(lattice) # once to install
+
+histogram( ~ percentHealthyCD4 | treatment, data = mice, 
+           layout = c(1,2), 
+           col = "orange", 
+           xlab = "Percent healthy CD4 cells", 
+           breaks = seq(0, 100, by = 5))
+```
+
+Inspect those histograms. Do they look like they have the same spread of observations (variance)? Let's use a test to see if they are. There are several choices to pick from in R. We'll use the **variance ratio** **test** (called the *F* test) to test the null hypothesis that the ratio of the variances is = 1.
+
+```{r}
+# Variance ratio test 
+var.test(mice$percentHealthyCD4 ~ mice$treatment)
+```
+
+So, here we conclude that the variances are not different from one another (or that the ratio between them is not different from 1), P = 0.21. Notice that the 95% CI includes 1.
+
+Because we failed to reject the null hypothesis that the variances are different, we can add the function `var.equal = TRUE` so that R would calculate the degrees of freedom using the "usual" pooled variance. If we had found that the variances were not equal, we could add `var.equal = FALSE` so that R would calculate the degrees of freedom using a statistical fix called **Welch's approximate *t***.
+
+Welch's approximation will usually give a fractional degrees of freedom (like 12.7). *Always round down* to the next whole number. This way we don't artificially make it easier to reject H~0~.
+
+The two-sample *t* test runs Welch's approximation by default in R. Frankly, it's always safer to use Welch's approximation. In this example there was no difference between the two methods.
+
+So, now we can run the *t* test to compare the means of the two populations.
+
+```{r}
+# Do the test
+t.test(percentHealthyCD4 ~ treatment, data = mice, var.equal = TRUE)
+```
+
+So, it's clear that we can reject the null hypothesis that these means come from the same statistical population, (*t* = 8.04, df = 12, P \< 0.001).
+
+------------------------------------------------------------------------
+
+## Conclusion
+
+The *t* test is a highly useful test for many biological variables when we are looking to compare an individual observation or a sample mean with a reference population or population expectation. We also saw the importance of doing some diagnostics on our samples to ensure that our data are normally-distributed (Shapiro-Wilk test and Q-Q plots) and have equal variances (*F* test).
+
+What happens when our data fail to meet the assumptions of the test that we want to use? How do we compare more than two samples? That comes soon.\
+\
+
+------------------------------------------------------------------------
+
+# Nonparametric tests
+
+## What happens when your data fail your test's assumptions?
+
+All the tests we've seen so far have been developed for data sets that conform to certain predictions, like a normal or binomial distribution. If you had a sample that didn't follow one of these distributions, or failed to align with another assumption of a test, then what would happen is that your chance of making a Type I error increases—you'd "cheat" the test—and in doing so reach a conclusion that is meaningless. Of course, this defeats the purpose of using statistics.
+
+## **Recognizing non-normality**
+
+As it turns out, R doesn't generate *truly* random numbers. Functions like `sample` ,`runif`, and `rnorm` and others do what are called "pseudorandom" numbers based on a starting "seed." I could have used the `random` package in R that does make truly random numbers but I wanted to make a static example for this tutorial. Here is a sample of random numbers I pulled from [random.org](http://random.org/):
+
+```{r}
+demo <- c(14, 1, 34, 93, 20, 90, 88, 15, 34, 98)
+mean(demo) 
+sd(demo) 
+hist(demo, col = "orange", main = "", breaks = seq(0,100, by = 4))
+```
+
+So those are truly random numbers between 1 and 100—we would expect their mean to be about 50. Next I had R choose 40 random numbers drawn from a normal distribution, and I got this:
+
+```{r}
+demo2 <- rnorm(40, mean = 50, sd = 10)
+
+hist(demo2, col = "orange", main = "", breaks = seq(0,100, by = 4))
+```
+
+The second histogram clearly looks more normally-distributed, and that's not surprising—I pulled a larger sample size *and* I specified that it should be normal, as opposed to a random sample without a distribution.
+
+Graphical plots like histograms are good for visually assessing normality. You've already seen that R has another built-in graphical method called the normal quantile plot, which plots your data against a hypothetical normal distribution. Compare the two samples from above:
+
+```{r}
+par(mfrow = c(1, 2)) # sets the graphics parameters so that there are two side-by-side plots
+
+qqnorm(demo, main = "demo", datax = TRUE) 
+qqnorm(demo2, main = "demo2", datax = TRUE)
+# datax = TRUE specifies that the sample data should go on the X axis
+```
+
+The Q-Q plot shows that `demo2` sample falls much closer to a straight line than the smaller sample does. But the `demo2` sample isn't exactly on a straight line, either. No matter what we should always run a formal test like the **Shapiro-Wilk test** which tests the null hypothesis that the data come from a normal distribution (or H~0~: data are normal).
+
+```{r}
+shapiro.test(demo)
+
+shapiro.test(demo2)
+```
+
+So, here we see that `demo` is not drawn from a normal distribution (*P* = 0.036) but `demo2` fails to reject H~0~, so we can conclude that it does come from a normal distribution (P \> 0.05).
+
+------------------------------------------------------------------------
+
+## **What to do when you can't do a regular *t* test**
+
+### **Option 1: Run the *t* test anyway**
+
+What's the worst that could happen? It's not going to break your computer. The mean of my `demo` sample is 48.7 and the standard deviation is 38.75 (which is a really big SD). Let's see if my non-normal dataset is different from my expected mean of 50.
+
+```{r}
+t.test(demo, mu = 50)
+```
+
+Ugh. We can't reject the H~0~ of having a different mean than 50 (*P* = 0.92). Our sample is nowhere close to that.
+
+::: callout-important
+So, with this sample, even if we cheat the test we can't reject H~0~, so tells us that there really is no difference from the population mean of 50 for this non-normal sample.
+:::
+
+### **Option 2: Transform your data**
+
+Sometimes we can transform our data to try to make them normal. Biologists frequently encounter variables that have values across many orders of magnitude. Consider the example of brain size in mammals. Because we are very different in body size and cognitive ability, brain size ranges from at about 1/10 of a gram (0.176 g in some shrews) to 1500 g for people to about 7000 g in a blue whale. You can see this wide range of variability for the sample of mammals shown below.
+
+The histogram of brain masses (in grams) from a sample of these selected insectivores, rodents, and primates would look like this:
+
+```{r}
+brains <- c(0.176, 0.347, 0.416, 1.02, 0.802, 1.802, 0.999, 3.759, 7.78, 18.365, 10.15, 15.73, 1600, 30.22, 53.21, 87.36, 1508) 
+hist(brains, breaks = seq(0, 1600, by = 5), xlim = c(0, 2000), main = "", xlab = "Brain mass (g)")
+```
+
+This barely looks like a histogram; it's not normal at all because there are a bunch of small values and a few large ones (even removing the two large outliers it's skewed). This would fail to conform with the assumptions of a *t* test. But seeing how non-normal our data are because of the large range of values, we should try a transformation before giving up.
+
+There are lots of transformations that are possible, but the most common one in biology (particularly in morphometrics) to "flatten out: curved distributions is the natural-log transformation.
+
+Transform the original vector into a new object using `log` to do the natural-log transformation...
+
+```{r}
+lnbrains <- log(brains) # ln-transformation making a new object
+```
+
+...and then compare the normal quantile plots for the original data vs. the transformed data.
+
+```{r}
+par(mfrow = c(1, 2)) # sets the graphics parameters so that there are two side-by-side plots
+
+qqnorm(brains, main ="Linear brain masses") 
+qqnorm(lnbrains, main = "Transformed brain masses")
+```
+
+While it's not perfectly linear, the transformed sample called `lnbrains` looks a lot more normal. A Shapiro-Wilk test confirms this:
+
+```{r}
+shapiro.test(brains)
+shapiro.test(lnbrains)
+```
+
+So, the transformation is not perfect, but it's not so bad that it would make a *t* test choke, so let's do the parametric *t* test now.
+
+Let's say that the average mass of a mammals brain (thinking across all living species) is about 500 g. The raw linear sample of brain masses has a mean of about 200 g, but we know that the mean is highly susceptible to outliers so it might trick the *t* test. If we want to see if this transformed sample has a mean of \~500 g, we first need to transform 500 g into about 6.21 ln g. This unit (ln g) is awkward, but it's only needed while doing the stats.
+
+```{r}
+mean(brains)
+log(500)
+```
+
+Our hypotheses are:
+
+H~0~: $\overline{Y}$= 6.21 ln g\
+H~a~: $\overline{Y}$ ≠ 6.21 ln g
+
+```{r}
+t.test(lnbrains, mu = 5.3)
+```
+
+So, from this we conclude that our estimate of the parametric mean of brain size for these species is between 0.64 and 3.43 ln g, or 1.9 to 30.9 g when we recover the original units, a range very different from our guess of 500 g (*t* = -4.96, df = 16, *P* = 0.0001 (We would "un-transform" these values with the *e^x^* function on a calculator or in R with `exp`.)
+
+::: callout-important
+It's [always]{.underline} necessary to return your data to the original units when stating your conclusion.
+:::
+
+```{r}
+# un-transform the data
+
+exp(0.6428663)
+exp(3.4303768)
+```
+
+### Option 3: Use a nonparametric alternative test
+
+#### The Sign test for one-sample *t* tests
+
+Almost every test has a non-parametric equivalent that lets you have a chance to answer questions with your rotten data. The **Sign test** is an alternative to either the one-sample or paired t test, but it works with the median instead of the mean. It tests these hypotheses:
+
+H~0~: The sample median is not different than the population mean (µ~0~)\
+H~a~: The sample median differs from µ~0~
+
+For paired tests, µ~0~ is usually zero. **The Sign test is identical to the binomial test** using *p* = 0.5 as the null probability of a hit. Use this test to calculate a probability for the observed outcome and all more extreme outcome combinations. Its only assumption is that you've sampled randomly from the population.
+
+The idea of this test is we are doing the over/under to compare two values. For a one-sample *t* test like my first example (`demo`) above, we would count the number of times that an observation was either above (+) or below (-) the hypothesized mean of 50:
+
+|                 |       |                          |
+|:---------------:|:-----:|:------------------------:|
+| **Observation** | $Y_i$ | **Comparison to µ = 50** |
+|        1        |  14   |            –             |
+|        2        |   1   |            –             |
+|        3        |  34   |            –             |
+|        4        |  93   |            \+            |
+|        5        |  20   |            –             |
+|        6        |  90   |            \+            |
+|        7        |  88   |            \+            |
+|        8        |  31   |            –             |
+|        9        |  24   |            –             |
+|       10        |  98   |            \+            |
+
+So, there are 6 – and 4 +. Fit those 6 hits into the binomial function, using *p* = 0.5.
+
+H~0~: Pr\[hit\] = 0.5\
+H~a~: Pr\[hit\] ≠ 0.5
+
+```{r}
+binom.test(6, n = 10, p = 0.5, alternative = "two.sided")
+```
+
+So we fail to reject the null hypothesis that the mean is different than 50 (or *p* = 0.5) because the 95% CI includes 0.5. Why not just use the *t* test result we got above? Because the sign test isn't being cheated when we do it this way—your conclusion is justified because you used this test that compares the medians instead.
+
+#### **The Sign test for paired *t* tests**
+
+Consider a drug that is being tested to see if it decreases the frequency of repetitive behaviors. The data here a sample of 10 subjects measured before and after one week on the drug.
+
+H~0~: There are fewer decreases or about the same number of increases and decreases of repetitive behaviors (*p* ≤ 0.5).\
+H~a~: There are more decreases of repetitive behaviors (*p* \> 0.5)
+
+```{r}
+## bring in the data
+repdrug <- read.csv(url("https://github.com/ericdewar/biostats/raw/refs/heads/master/rep-drug.csv"))
+View(repdrug)
+```
+
+R can count the frequencies of differences:
+
+```{r}
+# calculate a column of after - before differences
+repdrug$difference <- c(repdrug$after - repdrug$before) 
+
+## Are the data normal?
+shapiro.test(repdrug$difference)
+
+## Let R count the over/under values
+repdrug$result <- "equal" ## make this column first to set all rows as "equal"
+repdrug$result[repdrug$difference > 0] <- "above" ## register the increases
+repdrug$result[repdrug$difference < 0] <- "below" ## register the decreases
+repdrug$result <- factor(repdrug$result, levels = c("equal", "above", "below")) ## make those results into factors 
+
+table(repdrug$result) ## see the results
+```
+
+In case you're thinking that this is a lot of hassle for 8 observations, I would agree, but this workflow will work better than doing it by hand if you have 80 or 8000 observations. Okay, now do the sign/binomial test to see if you have more increases than decreases:
+
+```{r}
+binom.test(6, n = 8, p = 0.5, alternative = "greater")
+```
+
+The probability, then, of our observed outcome having more successes than failures and all the more extreme outcomes is 0.142, so we fail to reject H~0~. Notice that the observed probability (Pr\[hit\] = 0.75) is within the 95% CI.
+
+::: callout-important
+Understand this: If we had just done a parametric *t* test on those data, we would have rejected H~0~ (*t* = 2.06, df = 7, *P* = 0.039), but *that result would have been meaningless* because we would have cheated that test.
+
+Any nonparametric test has lower power than its corresponding "regular" parametric test. If you can discern differences with a parametric test without cheating, you will always reject H~0~ with a nonparametric test. On the other hand, nonparametric alternatives allow us to have some chance to work with data that otherwise would be untestable without cheating.
+:::
+
+#### Alternatives for a two-sample *t* test: the Mann-Whitney*-*Wilcoxon test and Welch's approximate *t* test
+
+The Mann-Whitney-Wilcoxon test (referred to as the Wilcoxon rank-sum test in R) compares two means by comparing the ranks of one sample vs. the ranks of the other. If there were differences in the median between two samples, you would expect that most of the small values would be in the sample with the lower median (or mean) and most of the large values would be in the sample with the higher median (or mean). R produces a test statistic called *W*. Just so you know in case you find this in papers, other sources call this test statistic *U* (elsewhere it's called the Mann-Whitney *U* test).
+
+Consider this example of CD4 cell counts in immunocompromised people. CD4 cells are a type of white blood cell; their levels in the blood are a measure of the competency of the immune system. We would expect that patients would have lower CD4 counts than control subjects.
+
+H~0~: The sample median of the controls ≤ than the median of the patients sample.\
+H~a~: The patient sample's median \> the patient sample.
+
+You'll notice that this dataset has enequal sample sizes between the two groups. That's not a problem; only the paired *t* test requires equal numbers in each group.
+
+```{r}
+cd4 <- read.csv(url("https://github.com/ericdewar/biostats/raw/refs/heads/master/cd4.csv"))
+head(cd4) # another way to preview data
+```
+
+Let's compare the medians to see what we'd expect.
+
+```{r}
+tapply(cd4$count, cd4$group, median)
+```
+
+Based on this, we expect that most of the smaller values should be in the patients group because it has the smaller median. Let's make another grouped histogram with the **`lattice`** package:
+
+```{r}
+library("lattice")
+
+histogram( ~ count | group, data = cd4, layout = c(1,2), col = "thistle", breaks = seq(0, 1400, by = 100), type = "count", xlab = "Count of CD4 cells", ylab = "Frequency")
+```
+
+As expected from the medians, we see that the patient group has more of the small values and the control group has more of the larger ones. Let's have R run the test now.
+
+```{r}
+wilcox.test(count ~ group, data = cd4, alternative = "greater")
+```
+
+Don't sweat that warning. It's just telling you that there are tied values (two of the controls had a count of 710. R can't calculate an exact P value if there are tied values. The R help tells us that "by default (if `exact` is not specified), an exact *P-*value is computed if the samples contain less than 50 values and there are no ties. Otherwise, a normal approximation is used"... and you get that error message.
+
+##### Another example:
+
+Consider this example of two species of salmon. Kokanee salmon are freshwater fish but sockeye salmon spend most of their lives in the ocean before coming upriver to spawn. Both species turn red as the mating season approaches. Biologists raised both types of salmon in a low-carotenoid environment in a lab to see how their coloration would differ. Carotenoids are red/orange pigments (carrots have them too). The level of redness was measured by a device that gives them a score for pigment saturation.
+
+H~0~: Kokanee redness = sockeye redness\
+H~a~: Kokanee redness ≠ sockeye redness
+
+```{r}
+salmon <- read.csv(url("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter13/chap13q20SalmonColor.csv"))
+```
+
+Plot the data with the `lattice` package:
+
+```{r}
+library("lattice")
+
+histogram( ~ skinColor | species, data = salmon, layout = c(1,2), 
+           col = "salmon", breaks = seq(0, 2.5, by = 0.1), 
+           type = "count", xlab = "Skin color measure", ylab = "Frequency")
+```
+
+Now do some data hygiene to check against the assumptions that the data are normally distributed and have approximately equal variances (SDs).
+
+```{r}
+# the brackets and double equal sign tells R to scan the species column for the name of a particular species
+shapiro.test(salmon$skinColor[salmon$species=="kokanee"]) 
+shapiro.test(salmon$skinColor[salmon$species=="sockeye"])
+```
+
+```{r}
+## OR you can do this to test for normality
+
+tapply(salmon$skinColor, salmon$species, shapiro.test)
+```
+
+Now test for equality of variances:
+
+```{r}
+var.test(salmon$skinColor[salmon$species=="kokanee"], 
+         salmon$skinColor[salmon$species=="sockeye"])
+```
+
+Even though the two groups are normally distributed, they do not have approximately equal variances, as is seen in the stacked histogram.
+
+Can we transform these data and then use a regular *t* test?
+
+```{r}
+salmon$lncolor <- log(salmon$skinColor) # Make ln-transformed column
+
+tapply(salmon$skinColor, salmon$species, shapiro.test) # check normality
+
+var.test(salmon$lncolor[salmon$species=="kokanee"], 
+         salmon$lncolor[salmon$species=="sockeye"]) # check variances
+```
+
+No, the samples are still too different here, but we have two options. As before, we could compare the medians of each sample using the Mann-Whitney-Wilcoxon test.
+
+```{r}
+tapply(salmon$skinColor, salmon$species, FUN = median, rm.na = TRUE)
+# The argument rm.na = TRUE is there so that the blank values are ignored.
+```
+
+```{r}
+# run the test to see if the medians differ
+wilcox.test(skinColor ~ species, data = salmon)
+```
+
+We are able to reject the null hypothesis and conclude that the medians of the two populations are different from each other (*W* = 303, P \< 0.0001).
+
+Alternatively, because the data are normally distributed but just have different variances, we can use Welch's approximate *t* test, which is a fix that uses a method to make a "pooled variance." R actually runs the test this way by default for the two-sample test, and that's what can produce the fractional degrees of freedom that you might have noticed.
+
+```{r}
+t.test(salmon$skinColor ~ salmon$species, var.equal = TRUE) # the parametric test es no bueno
+t.test(salmon$skinColor ~ salmon$species) # Welch's approximation is the default
+```
+
+\
+Going forward we'll see that every parametric test has a nonparametric alternative for when the data fail to meet the assumptions of the parametric tests.
+
+------------------------------------------------------------------------
+
+# Comparing more than two means: ANOVA
+
+We can't just use *t* tests when we want to compare the means of more than two samples. If we tried that, we would find that a regular *t* test ignores the differences in standard errors between combinations of samples and it artificially raises the true probability of a Type I error:
+
+|  |  |  |
+|:----------------------:|:----------------------:|:----------------------:|
+| **number of samples** | **number of pairwise tests needed** | **true** α, if we **start at 0.05** |
+| 2 | 1 | 0.05 |
+| 3 | 3 | 0.14 |
+| 4 | 6 | 0.26 |
+| 5 | 10 | 0.40 |
+| 6 | 15 | 0.54 |
+| 10 | 45 | 0.90 |
+
+So, if we have 10 samples, we'd have to do 45 two-sample *t* tests to compare all combinations, and the true probability of rejecting H~0~ would actually be much, much lower than our desired level of confidence. I would call that cheating the *t* test, so we need an alternative if we want to compare more than 2 means at the same time.
+
+## ANOVA
+
+The ANalysis Of VAriance can compare more than two variables (really the means of several samples) in one step. The first design we'll learn is called **one-way or single-factor ANOVA**. This is used when we are want to compare samples that should only vary in one way: their mean. Later we should be able to tackle more complicated designs that have blocking or other factors.
+
+Despite the name, ANOVA tests for differences in *means* while taking their SDs into account. It tests these hypotheses:
+
+H~0~: μ~1~=μ~2~=...μ~k~ (with *k* being the number of the last sample)\
+H~a~: At least one of these means if different from another
+
+ANOVA's algorithm breaks up the variation of the samples into three sources:
+
+-   the **total** variation: the dispersion from the grand mean (of all the observations in all groups)
+
+-   the **groups (among)** variation: the difference between each sample mean and the grand mean of all data points included
+
+-   the **error (within)** variation: the spread within each sample comparing each observation with its sample mean
+
+![](https://www.dropbox.com/scl/fi/we04jgtp6y7m0d19l8yo0/anova-errors.jpg?rlkey=hff075e28kx80tw682toz63iy&dl=1){fig-align="center"}
+
+From these, we get the mean square errors that are compared for the *F* test.
+
+-   **error mean square (MS~e~)**: pooled sample variance within groups
+
+-   **group mean square (MS~g~)**: differences among the means of the different groups
+
+\
+If the null hypothesis were true, then MS~groups~ should be about equal to the MS~error~, but if the error between the groups is significantly greater than the error within the groups (based on the *F* table), then there are real differences between at least one mean and at least one of the others.
+
+The variance ratio (*F*) is *F*=MSgroups/MSerror. For degrees of freedom, MS~groups~ has DF *k –* 1 and MS~error~ has DF *N* – *k*, where *k* is the number of groups and *N* is the total of all observations. It's traditional to summarize all the calculated values in an ANOVA table, which has these parts:
+
+|  |  |  |  |  |  |
+|------------|------------|------------|------------|------------|------------|
+| **Source of variation** | **Sum of squares** | **DF** | **Mean squares** | ***F*** | ***P*** |
+| **Groups (treatment)** | SS~groups~ | *k* – 1 | SS~g~/DF | MS~e~/MS~g~ |  |
+| **Error** | SS~error~ | *N – k* | SS~e~/DF |  |  |
+| **Total** | =SS~e~ + SS~g~ |  |  |  |  |
+
+If we do reject H~0~, then we know that at least one mean is significantly different from the rest, but no which one. If we reject H~0~, next we do multiple comparisons to find out where the differences lie.
+
+### Example of doing ANOVA in R
+
+Consider this example 30 mice fed different diets (Control, Junk food, and Health food) to compare differences in their weights. Our hypotheses would be:
+
+H~0~: Weight gain is the same in all groups (μ~control~ = μ~junk~ = μ~health~)\
+H~a~: At least one of these means if different from another
+
+We'll use $\alpha$ = 0.05 as usual.
+
+```{r}
+# Bring in the data 
+diets <- read.csv(url("https://github.com/ericdewar/biostats/raw/refs/heads/master/diets.csv"))
+
+
+# Let's generate a summary table with some calculations first
+
+meanDiets <- tapply(diets$mass, diets$group, mean)
+sdevDiets <- tapply(diets$mass, diets$group, sd)
+n <- tapply(diets$mass, diets$group, length)  # length is the sample size
+data.frame(mean = meanDiets, std.dev = sdevDiets, n = n)
+
+
+
+```
+
+Inspecting the data, we see that the control group gained a moderate amount of weight, the health food group gained less weight than the control, and the junk food group gained the most weight. The standard deviations aren't too different from one another, but that's hard to visualize from a table alone. Each of the samples has the same sample size, which is what we call having a "balanced" sample. It's not required our groups be balanced, but when we do, the ANOVA has more statistical power.
+
+Let's visualize our observations with a stripchart:
+
+```{r}
+
+stripchart(mass ~ group, data = diets, 
+           method = "jitter", vertical = TRUE, 
+           xlab = "Diet type", 
+           col = c("red", "darkgreen", "black"))
+```
+
+```{r}
+
+## Optional: You can add standard error bars to the strip chart if you like. It takes some extra steps but uses the objects created above
+
+stripchart(mass ~ group, data = diets, 
+           method = "jitter", vertical = TRUE, 
+           xlab = "Diet type", 
+           col = c("red", "darkgreen", "black"))
+
+seDiets <- sdevDiets / sqrt(n)  ## calculate standard error
+adjustAmount <- 0.15  ## This moves the bars over from the point cloud
+segments( c(1,2,3) + adjustAmount, meanDiets - seDiets, 
+      + c(1,2,3) + adjustAmount, meanDiets + seDiets)  ## makes upper and lower bonds for the lines
+```
+
+```{r}
+# Now calculate the linear model (more on linear models generally later) and then do the ANOVA
+
+# calculate the linear model
+dietsANOVA <- lm(diets$mass ~ diets$group) 
+
+# do the NOVA on the linear model object
+anova(dietsANOVA)
+```
+
+That value for *F* is pretty huge (usually you'll find that *F* \> 4 or so will be significant), and we see that *P* \< 0.001. This allows us to reject H~0~, meaning that at least one of these means is different than another. Which one is/ones are different? To determine that, we need to do a pairwise test that accounts for the differences in the groups' standard errors. For that we will use the Tukey HSD test (below).
+
+A linear model is set up with the general form of Y \~ X (or outcome measure \~ grouping variable)
+
+As a reminder, these functions are equivalent:
+
+> `dietsANOVA <- lm(diets$mass ~ diets$group)`
+>
+> `dietsANOVA <- lm(mass ~ group, data = mice)`
+
+If you wanted to know what fraction of the variation is described by the treatment groups, use this:
+
+```{r}
+dietsANOVAsummary <- summary(dietsANOVA)
+
+dietsANOVAsummary$r.squared
+```
+
+So, about 69% of the variation in the total sample is described by the grouping. We'll work with the full linear model summary later when we work with linear regression.
+
+### Pairwise tests using Tukey's HSD
+
+If we fail to reject the null hypothesis, our job is over—we don't have anything else to do.
+
+If we do reject H~0~, all that tells us is that at least one of those sample means is different than one other sample mean. That's great, but it doesn't really give us the information that we want. Now that we've calculated the MS~e~, we can look for where those differences are without artificially raising our true α.
+
+John Tukey was a well-regarded American statistician. His **Honestly Significant Difference test** earnestly gives you the pairwise comparisons between samples. If you failed to reject H~0~ in the ANOVA, all of the HSD results would be insignificant too. If you did reject H~0~ in the ANOVA, at least one of the sample means will be shown to be different from another one.
+
+There are a few ways to do this, but I'll demonstrate using base R. Doing it this way requires you do an `aov` function first.
+
+```{r}
+# do the ANOVA using aov
+dietAOV <- aov(mass ~ as.factor(group), data = diets)
+
+dietAOV  # see the output
+```
+
+Now we can do the HSD:
+
+```{r}
+# do the pairwise comparison test
+TukeyHSD(dietAOV, ordered = FALSE, conf.level = 0.95)
+```
+
+This output reports:
+
+-   `diff`: the difference in the means between the two groups compared
+
+-   `lwr` and `upr`: the lower and upper bounds of the confidence interval
+
+-   `p adj`: the "adjusted" p values for the comparison
+
+In this case, we find that all three samples are significantly different from each other, but that won't always be true. Only one has to be different for you to have rejected the null hypothesis in the first step.
+
+------------------------------------------------------------------------
+
+## The Kruskal-Wallace test: Nonparametric ANOVA
+
+Like all statistical tests, ANOVA has some assumptions:
+
+-   random sampling
+
+-   variable normally-distributed in all *k* populations that the samples come from
+
+-   equal variances in all *k* populations
+
+If our samples fail these assumptions, we can use a rank-order test for this (like the Mann-Whitney-Wilcoxon test was). You will calculate a $\chi^2$ value, using *k* – 1 degrees of freedom. This is a robust test when you have large sample sizes, and it can handle unequal variances if *n* is the same in each sample.
+
+For those same mouse diet data, it looks like this:
+
+```{r}
+kruskal.test(data$mass ~ data$group)
+```
+
+It's still a very significant result. Now we can do a pairwise test to see where the differences are.
+
+### Pairwise tests using Dunn's test
+
+Following a Kruskal-Wallace test, we would use Dunn's test to look for pairwise differences. Using that same dataset, we do this:
+
+```{r}
+install.packages("FSA") # install once
+library(FSA) # to to activate its functions
+
+dunnTest(diets$mass ~ diets$group, method="bh") # do pairwise comparisons
+```
+
+Again, all three groups are different from one another.\
+
+------------------------------------------------------------------------
+
+## Planned comparisons
+
+Tukey's HSD is technicalled an example of an "unplanned" comparison—we use it only if a "global" ANOVA finds at least one significant difference among the means. We could also choose to make planned comparisons, when we want to make only a specific comparison between a couple of groups.
+
+I think that we'll get the most use out of the unplanned comparisons above, but this is included here for completeness.
+
+For example, load the `InsectSprays` dataset:
+
+```{r}
+data("InsectSprays")
+
+summary(InsectSprays) ## This displays whether the dataset is balanced.
+```
+
+What if we only wanted to compare groups A and D? We could do that in base R, but the `multcomp` package is a little more intuitive once you already have a fitted linear model from a global ANOVA:
+
+```{r}
+# Install the package called multcomp once with install.packages("multcomp") You only need that the first time, and only if you didn't click the yellow "install" bar at the top of the script
+
+library(multcomp) # activate the package
+
+## First do the global ANOVA using the linear model
+sprayANOVA <- lm(count ~ spray, data = InsectSprays)
+
+# Inspect the table, if you like
+anova(sprayANOVA)
+```
+
+```{r}
+## The planned comparison of just sprays A and D is done by making a new object:
+
+sprayPlanned <- glht(sprayANOVA, linfct = mcp(spray = c("A - D = 0")))
+
+## glht is a function for general linear hypotheses
+## linfct says which linear hypotheses are to be tested.
+
+#### In this case, we're testing the null hypothesis that sprays A and D are the same (that is, = 0)
+
+## Once that is done, the 95% CI and summary table are easy:
+
+confint(sprayPlanned)
+```
+
+The `Estimate` is the estimated difference between the two means and `lwr` and `upr` again refer to the bounds of the CI.
+
+```{r}
+## For a different CI, specify the level (0.95 is the default)
+confint(sprayPlanned, level = 0.99)
+```
+
+```{r}
+## Here is the full results table if you wanted that
+summary(sprayPlanned)
+```
+
+That's all for now!
+
+------------------------------------------------------------------------
+
+# Bivariate statistical tests: Correlation and regression
+
+**X! Finally!** We've been spending all our time looking at response variables so far, and now we learn the first of the techniques that we'll use for looking at explanatory and response variables together.
+
+**You'll see that correlation and regression are both models that compare X (explanatory) and Y (response) variables, but these tests look at different things:**
+
+-   **Correlation** looks at the strength of the relationship (the clustering) between two variables but [does not]{.underline} assume that X *causes* the state of Y.
+
+    -   ***Answers the question:*** Does X change with Y in a linear fashion?
+
+-   **Regression** uses a linear model to *predict* the value of Y given a particular X. In this case we do assume that the value of X causes the value of Y.
+
+    -   ***Answers the question:*** Does the value of X strongly [predict]{.underline} the value of Y?
+
+![](https://www.dropbox.com/scl/fi/w3ngiepbx26wplv9eqa44/corr-regr.png?rlkey=9mf5eys2icpimbw7p3rfq6aa4&dl=1)
+
+## **Correlation tries to answer a few questions:**
+
+1.  Are two measurement variables related in a consistent, linear form?
+
+2.  If they are related, what is the direction of the relationship (positive or negative)?
+
+3.  What is the strength of their relationship (how tight is the data ellipse)?
+
+### Calculating Pearson's *r*
+
+The strength and direction of the relationship is described by a sample estimate called **Pearson's *r***, which estimates the parameter called $\rho$ (that's the Greek letter rho, [not]{.underline} a lower-case Roman letter p). The value of *r* and $\rho$ ranges from –1 to +1. Pearson's *r* is a sample estimate, like a sample mean or standard deviation. **First we calculate *r* and then we test for its significance*.***
+
+Simple linear correlation tests the hypotheses:
+
+H~0~: $\rho$ = 0\
+H~a~: $\rho$ ≠ 0
+
+Pearson's *r* is significant if it's sufficiently *different* than zero, as in the different data ellipses in these images:
+
+![](https://www.dropbox.com/scl/fi/rcp1dl2g28x919fzgqed5/signif-of-r.png?rlkey=5e9gsadbu7pkidd11z1i5a66o&dl=1)
+
+> In these examples, when
+>
+> -   *r* = 0.0, there's no recognizable linear relationship
+>
+> -   *r* = 0.5, there is slightly positive linear relationship
+>
+> -   *r* = -0.7, there is stronger negative linear relationship
+>
+> -   *r* = 0.9, there is an even stronger positive linear relationship.
+
+Simple linear correlation has some **assumptions**, as usual:
+
+-   bivariate random sampling from the population of interest
+
+-   both variables are numerical (measured at the ratio or at least interval scale)
+
+-   both variables are approximately normally-distributed
+
+    -   or if they aren't, they can be transformed to make them normal
+
+-   the relationship between the two variables is linear
+
+    -   *but* transformation may remove linearity—we have to re-check after transformation
+
+------------------------------------------------------------------------
+
+## Example of parametric linear correlation
+
+How birds fly (by powered flight or gliding or soaring, etc.) depends on the proportions of the parts of their wing and the size of their body. Consider a study of the ratios of bird wings and tail feathers. The data here show the relationship between the length of the feathers of the wing and the feathers of the tail (in mm) of 12 hummingbirds.
+
+```{r}
+# Bring in the data
+birds <- read.csv("https://github.com/ericdewar/biostats/raw/refs/heads/master/birds.csv")
+```
+
+First, we check for normality for X and Y:
+
+```{r}
+# check for normality
+shapiro.test(birds$wing)
+shapiro.test(birds$tail)
+```
+
+Looks good so far. Now let's plot the data.
+
+```{r}
+# Make a scatter plot. We set it up in the format Y ~ X.
+plot(tail ~ wing, data = birds, 
+     pch = 16, cex = 1.5, col = "blue2", pty = "s",
+     xlab ="Wing feather length (mm)", ylab = "Tail feather length (mm)")
+
+# pch means `plot character 16`, which is a filled-in circle
+# cex means `character expand by 1.5`, making it 50% bigger than the default
+```
+
+Okay, so we see that generally what we call the "data ellipse" in the scatter plot has a positive slope, so we'd tentatively say that it has a positive correlation, but let's calculate Pearson's *r* now with `cor.test`.
+
+```{r}
+# Do the correlation test and make it an object
+birdsCor <- cor.test(birds$tail, birds$wing)
+
+# Inspect the results of the correlation test
+birdsCor
+```
+
+This output tells us on the last line that the sample correlation test statistic *r* = 0.72, so we agree that it's a positive slope, but is it significantly different than 0?
+
+To answer that, the function `cor.test` also does a *t* test to see if Pearson's *r* is significantly different than 0 (or H~0~: $\rho$ = 0) and in this case finds a highly significant *P* = 0.008. Notice that it has 10 degrees of freedom: df = (# of X–Y pairs) – 2. It even helpfully gives the 95% CI, which obviously doesn't include 0 because H~0~ was rejected.
+
+You can do `cor.test` without making an object, but sometimes we want to use such an object later. If you just typed `cor.test(birds$tail, birds$wing)` into the console, you'd get the same output without making an object.
+
+### Nonparametric rank correlation using Spearman's *r*
+
+Real life happens and sometimes our data aren't normally distributed. Consider these data comparing exam scores in chemistry courses and biology courses. Is there a significant relationship between those two exam scores? Let's bring in the data and make a scatter plot:
+
+```{r}
+# Bring in the data
+exams <- read.csv("https://github.com/ericdewar/biostats/raw/refs/heads/master/exams.csv")
+
+# make a scatterplot 
+plot(bio ~ chem, data = exams, 
+     pch = 16, cex = 1.2, col = "red3", 
+     xlab = "Chemistry exam score", ylab = "Biology exam score")
+```
+
+Umm...maybe the slope is positive? It's hard to say because there's so much noise. The data are actually normal, but we'll apply the nonparamtric test as an example anyway. In this case we'll demonstrate the test here without making the object. You might also try a natural log transformation to see if that fixes the problem, but Spearman's rank method is solid.
+
+```{r}
+# test for normality first
+shapiro.test(exams$chem)
+shapiro.test(exams$bio)
+
+# add the 'spearman' argument to cor.test to do the rank-based calculation
+cor.test(exams$bio, exams$chem, method = "spearman")
+```
+
+Here we find that there is not a significant relationship between exam scores (*r~s~* = 0.56, *P* = 0.096). So, how well students did on biology exams doesn't seem to relate to how they did one chemistry exams.
+
+Note that the format for Pearson's (parametric) *r* is (Y \~ X) while the setup for Spearman's (nonparametric) *r*~s~ is (Y, X).
+
+\
+
+------------------------------------------------------------------------
+
+## Simple linear regression in R
+
+Simple linear regression [predicts]{.underline} a response variable's value (Y) based on the value of an explanatory variable (X). It's "simple" because it's only looking at a single explanatory variable; multivariate linear models also exist. A *strong* response of the Y variable will result in a scatter plot with a slope more different from 0 than one with a weaker (or nonsignificant) relationship. Unlike correlation, regression does assume a cause-and-effect relationship between X and Y.
+
+Regression makes a linear model to find the line that describes the relationship between the two variables. The method of "least squares" finds the equation for that line. The least squares method minimizes the differences (called residuals or residual error) between each point and the best-fit line.
+
+The equation for this line is
+
+$$
+Y=a+bX
+$$
+
+where *X* is the explanatory variable, *Y* is the response variable, *b* is the slope or rate of change, and *a* is the Y-intercept. We will be solving for the slope and the intercept.
+
+There are assumptions to regression, as you'd expect by now. These are assumptions about the response variable, as usual:
+
+-   at each $X_i$, there is a population of values of Y whose mean is on the "true" regression line
+
+-   at each $X_i$, the population of Ys is normal
+
+-   at each $X_i$, the variance of Y is the same
+
+-   at each $X_i$, the observations of Y are a random sample of the population of Y values
+
+In regression, we make no assumptions about X: it may be non-normal or fixed by the experimenter.
+
+Outliers can really change the slope, particularly when they're at the extremes of the range of X. A residual plot can be used to see if residuals are different across the range (more on this later). R will show the value of the residuals across five quantiles so that you can inspect it, at least.
+
+### Plotting data and finding the linear equation
+
+I have a dataset of lung capacities of my students that I have been accumulating since 2007. We suspect that there is a relationship between each person's height and their vital capacity. Let's plot it and do the linear model:
+
+```{r}
+# Bring in the data
+vc <- read.csv("https://raw.githubusercontent.com/ericdewar/biostats/refs/heads/master/vc.csv")
+
+# scatterplot of all data
+plot(capacity ~ height, data = vc, col = "firebrick", bty = "l", 
+     xlab = "Height (in.)", ylab = "Vital capacity (mL)", 
+     xlim = c(58, 76), ylim = c(1500, 6500))
+```
+
+That's fine if we had a single grouping variable. Want to show the difference between the outcomes for women and men? First plot one group with `plot()` and the others using `points()`. Some notes:
+
+-   `bty = "l"` indicates that you want the box around the plot to be an L shape.
+
+-   For choosing plotting characters, `pch = 1` is for an open circle and `pch = 0` yields an open square. See the help in R under `pch` for your options.
+
+```{r}
+# Make a scatterplot with different icons for female and male participants. Plot female participants first:
+plot(vc$capacity[sex=="F"] ~ vc$height[sex=="F"], data = vc, 
+     pch = 1, col = "goldenrod", bty = "l", 
+     xlab = "Height (in.)", ylab = "Vital capacity (mL)", 
+     xlim = c(58, 76), ylim = c(1500, 6500))
+
+# add male participants onto the rest of the plot
+points(vc$capacity[vc$sex=="M"] ~ vc$height[vc$sex=="M"], pch = 0, col = "blue")
+
+# Add the legend with icons
+legend("topleft", # Position of the legend
+       legend = c("Women", "Men"), # Text labels for the legend
+       col = c("goldenrod", "blue"), # Colors corresponding to the lines
+       pch = c(1, 0), # Point characters (icons) corresponding to the lines
+       cex = 0.8) # Size of the legend text and icons
+```
+
+-   The double equal signs (as in `[sex=="F"]` above) indicate *identity* to pick your groups.
+
+Okay, so let's do the linear model using `lm`. For this we'll make a new object and then get the reporting about it. I'll unpack it below.
+
+```{r}
+# Calculate the linear model, in the form lm(Y ~ X, data = name_of_dataframe)
+
+vcRegression <- lm(capacity ~ height, data = vc)
+
+
+# call for the reporting about the regression/LM
+summary(vcRegression)
+```
+
+-   Notice that here I run the regression using the linear model function `lm` and save the linear model as an object. This way I can interrogate it to get the summary or run an ANOVA on it to test hypotheses.
+
+### Testing hypotheses about the slope and intercept
+
+Regression is not an hypothesis test by itself. It uses *t* and *F* to determine if the slope of the line is significantly different from 0. The reporting also tells us if the y-intercept is different from 0 too, but that's usually not as critical for our kinds of questions.
+
+![](https://www.dropbox.com/scl/fi/glpb3fnx9y4skxekessqn/regr.png?rlkey=xc81kybku1yj5yndpw2v69px9&dl=1)
+
+There is a lot of reporting in the output above; let's break it down. (I used [this website](https://feliperego.github.io/blog/2015/10/23/Interpreting-Model-Output-In-R) as a basis for this section.)
+
+**Formula Call**
+
+The first item shown in the output is the formula R used to fit the data. R nerds call this the "call."
+
+**Residuals**
+
+Residuals are the difference between the observed response values and the response values that the model predicted. The `Residuals` section of the model output breaks it down into 5 summary points. When assessing how well the model fit the data, look for a symmetrical distribution across these points on the mean value zero (0). Our data set are reasonably symmetrical through each quantile, at least by eye. It goes from negative to positive, but that's okay—we expect that the point ($\overline{X}, \overline{Y}$) should have a residual close to 0 while we have negative residuals for smaller values of X and positive residuals for larger values of X.
+
+**Coefficients**
+
+The next section in the model output talks about the coefficients of the model. Theoretically, in simple linear regression, the coefficients are two unknown constants that represent the intercept and slope terms in the linear model. For our data, `(Intercept)` represents the Y-intercept (*a*) of our best-fit line and `height` represents the slope (*b*). The `t value` shows how far each value is from 0 (a is \~12 SD below 0 and b is \~18 SD higher). The *P*-values for those two statistics max out R's *P*-value calculator. In particular, we are interested in the *significance* of the slope: in order for the relationship to be meaningful, the slope needs to be sufficiently greater (or less) than 0.
+
+Here, we're seeing a strongly positive slope, showing that taller people have a larger vital capacity than shorter people. Really this means that taller people have a chest cage with a larger volume, and *that* yields the larger VC.
+
+> **What would a non-significant result mean?** Imagine instead that we were comparing height with the number of feet my students had. Regardless of their height, all students had two feet, so the slope would be 0, indicating a non-significant (or non-causal) relationship between height and number of feet.
+
+**Multiple R-squared, Adjusted R-squared**
+
+The *R*^2^ statistic ([not]{.underline} the same thing as Pearson's *r* or Spearman's *r*~s~) provides a measure of how well the model is fitting the actual data. It takes the form of a proportion of variance. This is somewhat similar to the way that we use Pearson's *r* in correlation by describing the "tightness" of the data ellipse.
+
+*R*^2^ is a measure of the linear relationship between our predictor variable (height) and our response / target variable (capacity). It always lies between 0 and 1 (i.e.: a number near 0 represents a regression that does not explain the variance in the response variable at all and a number close to 1 does explain the observed variance in the response variable closer to 100%).
+
+In our example, the *R*^2^ we get is around 0.5, so roughly half of the variance found in the response variable `capacity` can be explained by the predictor variable `height`. This might lead you to believe that there might be other variables that would also affect VC. It's hard to say what the exact cutoff is, though. That will probably depend on the application.
+
+In multiple regression settings, the *R*^2^ will always increase as more variables are included in the model. That’s why the adjusted *R*^2^ is the preferred measure as it adjusts for the number of variables considered.
+
+**F-Statistic**
+
+The *F*-statistic is a good indicator of whether there is a relationship between our predictor and the response variables. The further the *F* is from 1 the better it is. However, how much larger the *F* needs to be depends on both the number of data points and the number of predictors. Generally, when the number of data points is large, an *F* that is only a little bit larger than 1 is already sufficient to reject the null hypothesis (H~0~: There is no relationship between height and capacity). The reverse is true as if the number of data points is small, a large *F* is required to be able to ascertain that there may be a relationship between predictor and response variables. In our example the F-statistic is 342.3 which is significantly larger than 1 given the size of our sample.
+
+You have the basic result from this `summary` function, but to see the full ANOVA table, do this:
+
+```{r}
+anova(vcRegression)
+```
+
+`confint` will give you the confidence interval for each statistic (95% by default):
+
+```{r}
+confint(vcRegression)
+```
+
+### Plotting the least-squares line with confidence interval bands for the slope
+
+After you have made the regression object, you can use it to plot the least-squares line. There is a way to make the plot in base R, but I prefer to it using the `ggplot2` package.
+
+A caution: it's **always a bad idea to extrapolate beyond your observed data**. The relationship we recovered here works well to describe people with adult-proportioned bodies, but the same equation is not likely to be true for, say, infants or young children.
+
+So this slope could be as high as 176 mm^3^/in or as low as 142 mm^3^/in and still be significant. We show this graphically by making the confidence bands. In this case, I prefer the plotting function using the `ggplot2` package. It also has the advantage of only plotting the best-fit line over the range of the observed data.
+
+```{r}
+# install.packages("ggplot2") ## only need this once; I made this a comment to avoid repeated installations
+
+# 95% CI using ggplot (all one color)
+library(ggplot2)
+ggplot(vc, aes(height, capacity)) + 
+        geom_point(size = 3, col = "firebrick") +
+        geom_smooth(method = "lm", se = TRUE, col = "black") +
+        labs(x = "Height (in.)", y = "Vital capacity (mL)") + 
+        theme_classic()
+```
+
+These confidence bands are very close to the least-squares line. That's good, and expected, because the *P*- value on the significance tests were so high. Notice that they're closer at point ($\overline{X}, \overline{Y}$) than at the extremes of the range of X.
+
+### Confidence intervals for predictions
+
+Once we have calculated the linear model, we can also get the 95% CI for the predicted value of the outcome variable for a given explanatory value (called the prediction interval). To get the 95% prediction interval for a person from the vital capacity dataset who is 5'11" tall:
+
+```{r}
+# 95% CI for predictions for Yi at a given X
+
+newdata = data.frame(height = 71) # make a little data frame for the value of interest
+
+predict(vcRegression, newdata, interval = "predict") # predict Yi using the linear model object
+```
+
+\
+The predicted value based on the sample estimates is the `fit` column, followed by the lower and upper bounds of the 95% prediction interval.
+
+```{r}
+newdata1 = data.frame(height = c(64, 66, 68)) # can also predict CIs for several Yi values
+predict(vcRegression, newdata1, interval = "predict")
+
+newdata2 = data.frame(height = c(60:72)) # can also predict CIs for a range of Yi values
+predict(vcRegression, newdata2, interval = "predict")
+```
+
+\
+
+------------------------------------------------------------------------
+
+### Beware nonlinear data!
+
+If plotting your data shows that they are visually nonlinear, **you must transform them** to do linear regression. There are "smoothing" techniques that are also helpful, but we'll stick with transformations of power curves and exponential curves.
+
+**Power curves** have the form Y=aX^b^. Make them linear by **ln-transforming X and Y and then doing the linear model on those transformed variables.**
+
+Remember that you can make a new column with the transformed data by using a function like:
+
+```{r}
+vc$lnheight <- log(vc$height)
+```
+
+Exponential curves have the form Y=ab^X^. Make them linear by **ln-transforming Y and X and then calculating the linear model on the transformed Y vs. X.**
+
+# Approaches to nonlinear regression
+
+## Doing some regression diagnostics
+
+Recall in linear aggression we assume that there is a consistent linear relationship between the value of an outcome variable for a given explanatory variable.
+
+Here is the vital capacity dataset again. We'll remake the model and the main reporting plots:
+
+```{r}
+# Bring in the vital capacity data
+vc <- read.csv("https://raw.githubusercontent.com/ericdewar/biostats/refs/heads/master/vc.csv")
+
+# Calculate the linear model, in the form lm(Y ~ X, data = name_of_dataframe)
+vcRegression <- lm(capacity ~ height, data = vc)
+
+# call for the reporting about the regression/LM
+summary(vcRegression)
+
+# plot the 95% CI for the slope
+library(ggplot2) # activate functions
+
+ggplot(vc, aes(height, capacity)) + 
+        geom_point(size = 3, col = "firebrick") +
+        geom_smooth(method = "lm", se = TRUE, col = "black") +
+        labs(x = "Height (in.)", y = "Vital capacity (mL)") + 
+        theme_classic()
+
+# plot the prediction intervals
+vc2 = data.frame(vc, predict(vcRegression, interval = "prediction"))
+
+ggplot(vc2, aes(height, capacity)) + 
+    geom_ribbon(aes(ymin = lwr, ymax = upr, fill='prediction'), 
+        fill = "black", alpha = 0.2) +
+    geom_smooth(method = "lm", se = FALSE, col = "black") +
+    geom_point(size = 3, col = "firebrick") + 
+    labs(x = "Height (in.)", y = "Vital capacity (mL)") + 
+    theme_classic()
+```
+
+Remember that `summary` gives this information:
+
+-   The **residuals**: the error of the model along 5 points. We are looking for symmetry (or you can check for linearity below).
+
+-   The **tests on the significance of the slope** (both *t* and *F* given)
+
+-   The **R^2^**, which shows how much of the variation in Y is described by X. (This is similar to what *r* tells us in correlation)
+
+::: callout-warning
+Note that you should **never** predict an outcome value outside your observed range of predictor values.
+:::
+
+For example, what if you wanted to apply the linear model to one of those huge halloween skeleton displays? Or to a newborn 20 in. long?
+
+```{r}
+# 95% CI for predictions for Yi at a given X
+
+newdata1 = data.frame(height = 144, capacity = NA)
+predict(vcRegression, newdata1, interval = "predict") 
+
+```
+
+```{r}
+
+newdata2 = data.frame(height = 20) 
+predict(vcRegression, newdata2, interval = "predict") 
+```
+
+That is a problem. A negative vital capacity is biologically meaningless. Infants must have different scaling rules than adults. (Back in the 1970s, the linear model was calculated as
+
+### Detecting nonlinearity
+
+I'm a little embarrassed to say that I lied to you about these data. It turns out that adults lie to each other all the time, but scientists shouldn't. The Y variable isn't *actually* normally distributed, so one of the assumptions of linear regression wasn't upheld.
+
+Let's check the **capacity** variable. Additionally, you can make a quick residual plot in base R to look for linearity.
+
+```{r}
+# test for normality on Y
+shapiro.test(vc$capacity)
+
+# make a residual plot
+plot(vcRegression, which = 1)
+```
+
+Can we fix it? Let's try a transformation to try to make it better.
+
+```{r}
+# transform both axes
+vc$LNheight <- log(vc$height)
+vc$LNcapacity <- log(vc$capacity)
+
+shapiro.test(vc$LNcapacity)
+```
+
+That's better. Let's run a linear model on the transformed data and then compare the residual plots.
+
+```{r}
+# regression on transformed data
+vcLNRegr <- lm(vc$LNcapacity ~ vc$LNheight, data = vc)
+summary(vcLNRegr)
+
+# compare residual plots
+par(mfrow = c(1, 2)) # puts plots side by side  (1 row, 2 columns)
+plot(vcRegression, which = 1, main = "untransformed")
+plot(vcLNRegr, which = 1, main = "ln transformed")
+```
+
+It doesn't look too bad, but some low values seem to be pulling up the residuals. Another way to visualize this is with a component-plus-residual plot. Note that `car` refers to the package called "Companion to Applied Regression." We use the double-colon syntax to specify that we want to use this function from this particular package.
+
+```{r}
+car::crPlots(vcLNRegr,
+             pch=20, col="gray",
+             smooth = list(smoother=car::gamLine))
+
+```
+
+The dashed line would be perfectly linear data. Our actual VC data (in pink) looks okay.
+
+Common nonlinear relationships that can usually be fixed by natural-log transformation include power functions and exponential functions.
+
+![](https://www.dropbox.com/scl/fi/xt99c967m3acz54zrbk6a/nonlinear.jpg?rlkey=hl4wql0vvy75em3mb6qgaak1p&dl=1){fig-align="center" width="350"}
+
+But as always, remember to un-transform your data to the original units after any predictions.
+
+------------------------------------------------------------------------
+
+## Nonlinear regression
+
+Not all bivariate data are appropriate to use for linear regression, even after transformation. Here are a few examples.
+
+### Michaelis-Menten curve
+
+This relationship is common with growth-rate data, and is comonly seen in biochemistry. The equation is
+
+$$
+Y = \frac{aX}{b+X}
+$$
+
+Let's fit a nonlinear regression curve having an asymptote (Michaelis-Menten curve). The data shown are the relationship between population growth rate of a phytoplankton in culture and the concentration of iron in the medium.
+
+```{r}
+# bring in the data
+phytoplankton <- read.csv(url("http://www.zoology.ubc.ca/~schluter/WhitlockSchluter/wp-content/data/chapter17/chap17f8_1IronAndPhytoplanktonGrowth.csv"))
+
+# make a scatter plot to look for linearity
+plot( phytoGrowthRate ~ ironConcentration, data = phytoplankton, pch = 16, 
+      col = "firebrick", las = 1, cex = 1.5, bty = "l", 
+      ylab = "Growth rate (no./day)",
+      xlab = expression(paste("Iron concentration (", mu, "mol)")) )
+
+```
+
+Visually it doesn't look very linear. It is possible to fit a curve that would pass through all these points, but it is very unlikely that particular curve would have much predictive value. We are able to fit these data with a simpler function that starts with a Y-intercept at 0.0 and then increases to saturation with a decreasing slope.
+
+We'll fit a Michaelis-Menten curve to the phytoplankton data using the `nls` (nonlinear least squares) function. To fit the curve, provide a formula that also includes symbols for the parameters to be estimated. In the following function, we use "a" and "b" to indicate the parameters of the Michaelis-Menten curve we want to estimate. The function includes an argument where we must provide an initial guess of parameter values. The value of the initial guess is not so important—here we choose a=1 and b=1 as initial guesses.
+
+The first function below carried out the model fit and save the results in an R object named phytoCurve.
+
+```{r}
+phytoCurve <- nls(phytoGrowthRate ~ a*ironConcentration / (b+ironConcentration), 
+                  data = phytoplankton, list(a = 1, b = 1))
+
+# Obtain the parameter estimates using the summary command to, including 
+#   standard errors and t-tests of null hypotheses that parameter values are zero.
+summary(phytoCurve)
+
+# Now we can add the nonlinear regression curve to scatter plot. We'll start with the plotting function from the previous block.
+
+plot( phytoGrowthRate ~ ironConcentration, data = phytoplankton, pch = 16, 
+      col = "firebrick", las = 1, cex = 1.5, bty = "l", 
+      ylab = "Growth rate (no./day)",
+      xlab = expression(paste("Iron concentration (", mu, "mol)")) )
+
+xpts <- seq(min(phytoplankton$ironConcentration), 
+            max(phytoplankton$ironConcentration), length.out = 100)
+ypts <- predict(phytoCurve, new = data.frame(ironConcentration = xpts))
+lines(xpts, ypts)
+```
+
+Many of the functions that can be used to extract results from a saved lm object work in the same way when applied to an nls object, such as `predict`, `residuals`, and `coef`.
+
+### Quadratic curves
+
+“Humped” data like the case at the right sometimes come up in biology. It is possible to fit this parabolic curve with a quadratic (second-degree polynomial) equation.
+
+This approach is most justified if the data are fairly symmetrical. Consider these data that show the relationship between the number of plant species present in ponds and pond productivity.
+
+```{r}
+# bring in the data
+pondProductivity <- read.csv(url("http://www.zoology.ubc.ca/~schluter/WhitlockSchluter/wp-content/data/chapter17/chap17f8_2PondPlantsAndProductivity.csv"))
+
+# make a scatter plot to look for linearity
+plot(species ~ productivity, data = pondProductivity, pch = 16, 
+     col = "firebrick", las = 1, cex = 1.5, bty = "l", 
+     ylab = "Number of species", xlab = "Productivity (g/15 days)" )
+
+
+```
+
+Now we actually fit a quadratic curve to the data. Here, the single variable productivity in the data frame is included in the formula both as itself and as the squared term, `productivity^2.` To make the squared term work, we need to "wrap" or "insulate" the term with `I()`. The results of the model fit are saved in an R object called productivityCurve.
+
+```{r}
+productivityCurve <- lm(species ~ productivity + I(productivity^2), 
+                        data = pondProductivity)
+
+# Show estimates of the parameters of the quadratic curve (regression coefficients) 
+#   are obtained as follows, along with standard errors and t-tests.
+summary(productivityCurve)
+
+# Add quadratic regression curve to scatter plot. We'll redraw the plot in this block.
+plot(species ~ productivity, data = pondProductivity, pch = 16, 
+     col = "firebrick", las = 1, cex = 1.5, bty = "l", 
+     ylab = "Number of species", xlab = "Productivity (g/15 days)" )
+
+xpts <- seq(min(pondProductivity$productivity), max(pondProductivity$productivity), 
+            length.out = 100)
+ypts <- predict(productivityCurve, new = data.frame(productivity = xpts))
+lines(xpts, ypts)
+```
+
+### Smoothing
+
+Software is able to fit a curve without specifying a formula. Several methods exist, with names like “kernel,” spline,” and “loess.”
+
+The formula takes information from nearby data points to estimate the best-fit line. One can specify the complexity of the formula by setting the effective degrees of freedom.
+
+Here we fit a formula-free curve (cubic spline) to the relationship between body length and age for a large sample of female fur seals.
+
+```{r}
+# bring in the data
+shrink <- read.csv(url("http://www.zoology.ubc.ca/~schluter/WhitlockSchluter/wp-content/data/chapter17/chap17e8ShrinkingSeals.csv"))
+
+# make a scatter plot to look for linearity
+plot(jitter(length, factor = 2) ~ ageInDays, data = shrink, pch = ".", 
+     col = "firebrick", las = 1, bty = "l", ylab = "Body length (cm)",
+     xlab = "Female age (days)")
+```
+
+Now we fit a cubic spline. The argument `df` stands for effective degrees of freedom, which allows you to control how complicated the curve should be. The simplest possible curve is a straight line, which has df=2 (one for slope and another for intercept). More complex curves require more degrees of freedom. Here we fit a very complicated curve.
+
+```{r}
+shrinkCurve <- smooth.spline(shrink$ageInDays, shrink$length, df = 400)
+
+# Add curve to scatter plot, again we start by redrawing the plot.
+plot(jitter(length, factor = 2) ~ ageInDays, data = shrink, pch = ".", 
+     col = "firebrick", las = 1, bty = "l", ylab = "Body length (cm)",
+     xlab = "Female age (days)")
+
+xpts <- seq(min(shrink$ageInDays), max(shrink$ageInDays), length.out = 1000)
+ypts <- predict(shrinkCurve, xpts)$y
+lines(xpts, ypts)
+```
+
+### Logistic regression
+
+Common when handling binary (0/1) outcomes with several different treatments, like a dose-response curve. Linear regression is unsuitable because binary outcomes violate three of the assumptions. Logistic regression uses a general linear model to handle these constraints of data.
+
+Here the example is about the relationship between mortality of guppies and the duration of their exposure to a temperature of 5° C.
+
+```{r}
+# bring in the data
+guppy <- read.csv(url("http://www.zoology.ubc.ca/~schluter/WhitlockSchluter/wp-content/data/chapter17/chap17f9_1GuppyColdDeath.csv"))
+
+# Draw a frequency table of mortality at different exposure times.
+table(guppy$mortality, guppy$exposureDurationMin, 
+      dnn = c("Mortality","Exposure (min)"))
+
+# make a stripchart to inspect
+plot(jitter(mortality, factor = 0.1) ~ jitter(exposureDurationMin, factor = 1),  
+     data = guppy, col = "firebrick", las = 1, bty = "l", ylab = "Mortality",
+     xlab = "Duration of exposure (min)")
+```
+
+Now we fit the logistic regression model with the function `glm`.
+
+```{r}
+guppyGlm <- glm(mortality ~ exposureDurationMin, data = guppy,
+                family = binomial(link = logit))
+
+# Add logistic regression curve to scatter plot.
+plot(jitter(mortality, factor = 0.1) ~ jitter(exposureDurationMin, factor = 1),  
+     data = guppy, col = "firebrick", las = 1, bty = "l", ylab = "Mortality",
+     xlab = "Duration of exposure (min)")
+
+xpts <- seq(min(guppy$exposureDurationMin), max(guppy$exposureDurationMin), 
+            length.out = 100)
+ypts <- predict(guppyGlm, newdata = data.frame(exposureDurationMin = xpts), 
+                type = "response")
+lines(xpts, ypts)
+
+# Table of regression coefficients, with parameter estimates
+summary(guppyGlm)
+
+# 95% confidence intervals for parameter estimates. It is necessary to load the MASS package first. 
+library(MASS)
+confint(guppyGlm)
+
+```
+
+```{r}
+# Predict probability of mortality (mean mortality) for a given x-value, 10 min duration, including standard error of prediction.
+
+predict(guppyGlm, newdata = data.frame(exposureDurationMin = 10),
+        type = "response", se.fit = TRUE)
+```
+
+```{r}
+# Estimate the LD50, the dose at which half the individuals are predicted to die from exposure.
+library(MASS)
+dose.p(guppyGlm, p = 0.50)
+```
+
+```{r}
+# Analysis of deviance table, with a of the null hypothesis of zero slope 
+anova(guppyGlm, test = "Chi")
+```
